@@ -44,7 +44,7 @@ const char *getPassword(struct User u)
         exit(1);
     }
 
-    while (fscanf(fp, "%s %s", userChecker.name, userChecker.password) != EOF)
+    while (fscanf(fp, "%d %s %s",&userChecker.id, userChecker.name, userChecker.password) != EOF)
     {
         if (strcmp(userChecker.name, u.name) == 0)
         {
@@ -67,7 +67,7 @@ void registerMenu()
 
     system("clear");
     // get name
-    printf("\n\n\n\t\t\t Bank Management System\n\t\t\t\t\t Registration\n\t\t\t\t\t Username:");
+    printf("\n\n\n\t\t\t Bank Management System\n\t\t\t\t\t Registration\n\t\t\t\t\t Username: ");
     scanf("%s",newUser.name);
 
     // check that name is unique
@@ -78,7 +78,12 @@ void registerMenu()
         exit(1);
     }
 
-    fclose(pf);
+    
+
+    // get id
+    printf("\n\n\t\t\t\tid no: ");
+    scanf("%d", &newUser.id);
+
 
     // disabling echo
     tcgetattr(fileno(stdin), &oflags);
@@ -94,19 +99,19 @@ void registerMenu()
 
 
     // get password
-    printf("\n\n\n\n\n\t\t\t\tEnter the password to register:");
+    printf("\n\n\t\t\t\tEnter the password to register:");
     scanf("%s", newUser.password);
 
-    fprintf(pf,"%d %s %s\n",newUser.id,newUser.name,newUser.password);
 
+
+    fprintf(pf,"%d %s %s\n",newUser.id,newUser.name,newUser.password);
+    fclose(pf);
     // restore terminal
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
     {
         perror("tcsetattr");
         return exit(1);
     } 
-
-
 };
 
 int checkNameIsUnique(FILE *pt,const char *r) {
