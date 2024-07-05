@@ -3,7 +3,9 @@
 const char *RECORDS = "./data/records.txt";
 
 int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
-{
+{   if (ptr == NULL || r == NULL){
+    return 0;
+    }
     return fscanf(ptr, "%d %d %s %d %d/%d/%d %s %d %lf %s",
                   &r->id,
 		  &r->userId,
@@ -15,7 +17,7 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
                   r->country,
                   &r->phone,
                   &r->amount,
-                  r->accountType) != EOF;
+                  r->accountType) != EOF; //return 1 if successful
 }
 
 void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
@@ -114,6 +116,7 @@ noAccount:
 
     while (getAccountFromFile(pf, userName, &cr))
     {
+    
         if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr)
         {
             printf("✖ This Account already exists for this user\n\n");
@@ -128,7 +131,9 @@ noAccount:
     scanf("%lf", &r.amount);
     printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
     scanf("%s", r.accountType);
-
+    printf("%d",u.id);
+    // printf("%s",u.name);
+    // printf("%s",u.password);
     saveAccountToFile(pf, u, r);
 
     fclose(pf);
