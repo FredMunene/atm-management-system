@@ -104,6 +104,7 @@ void createNewAcc(struct User u)
     struct Record cr;
     char userName[50];
     FILE *pf = fopen(RECORDS, "a+");
+    int lastId = getLastId(pf);
 
 noAccount:
     system("clear");
@@ -123,6 +124,10 @@ noAccount:
             goto noAccount;
         }
     }
+
+    r.id = lastId + 1;
+    
+    
     printf("\nEnter the country:");
     scanf("%s", r.country);
     printf("\nEnter the phone number:");
@@ -167,4 +172,27 @@ void checkAllAccounts(struct User u)
     }
     fclose(pf);
     success(u);
+}
+
+int getLastId(FILE *ptr)
+{
+
+    struct Record r;
+    struct User u;
+    int lastId = -1;
+    while (fscanf(ptr,"%d %d %s %d %d/%d/%d %s %d %2lf %s\n\n",
+            &r.id,
+	    &u.id,
+	    u.name,
+            &r.accountNbr,
+            &r.deposit.month,
+            &r.deposit.day,
+            &r.deposit.year,
+            r.country,
+            &r.phone,
+            &r.amount,
+            r.accountType) == 11){
+                lastId = r.id;
+            }
+    return lastId;
 }
