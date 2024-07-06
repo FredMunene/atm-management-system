@@ -40,3 +40,4 @@ void mainMenu(struct User u);
 void checkAllAccounts(struct User u);
 
 int checkNameIsUnique(FILE *pt,const char *r);
+int getLastId(FILE *ptr);
