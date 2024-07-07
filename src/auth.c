@@ -104,7 +104,7 @@ void registerMenu()
 
 
 
-    fprintf(pf,"%d %s %s\n",newUser.id,newUser.name,newUser.password);
+    fprintf(pf,"%d %s %s\n\n",newUser.id,newUser.name,newUser.password);
     fclose(pf);
     // restore terminal
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
