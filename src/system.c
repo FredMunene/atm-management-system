@@ -5,7 +5,9 @@ const char *RECORDS = "./data/records.txt";
 int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
 {   if (ptr == NULL || r == NULL){
     return 0;
+    
     }
+   // printf("is it a infinite loop");
     return fscanf(ptr, "%d %d %s %d %d/%d/%d %s %d %lf %s",
                   &r->id,
 		  &r->userId,
@@ -23,7 +25,7 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
 void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
 {
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
-            r.id,
+            u.id,
 	    u.id,
 	    u.name,
             r.accountNbr,
@@ -117,15 +119,15 @@ noAccount:
 
     while (getAccountFromFile(pf, userName, &cr))
     {
-    
+        printf("%s %s %d %d",userName, u.name,cr.accountNbr,r.accountNbr);
         if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr)
         {
             printf("✖ This Account already exists for this user\n\n");
             goto noAccount;
         }
     }
-
-    r.id = lastId + 1;
+    
+    r.id = lastId;
     
     
     printf("\nEnter the country:");
@@ -180,7 +182,7 @@ int getLastId(FILE *ptr)
     struct Record r;
     struct User u;
     int lastId = -1;
-    while (fscanf(ptr,"%d %d %s %d %d/%d/%d %s %d %2lf %s\n\n",
+    while (fscanf(ptr,"%d %d %s %d %d/%d/%d %s %d %2lf %s",
             &r.id,
 	    &u.id,
 	    u.name,
@@ -193,6 +195,15 @@ int getLastId(FILE *ptr)
             &r.amount,
             r.accountType) == 11){
                 lastId = r.id;
+
+                 // Read and discard the two newlines after each entry
+        int c;
+        while ((c = fgetc(ptr)) != EOF && (char)c != '\n'); // Skip until newline or EOF
+        if (c == EOF) {
+            break; // Break if EOF reached
+        }
             }
+
+    // printf("last index: %d ", lastId);
     return lastId;
 }
