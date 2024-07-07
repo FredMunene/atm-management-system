@@ -83,8 +83,7 @@ void initMenu(struct User *u)
         case 2:
             // student TODO : add your **Registration** function
             registerMenu();
-            printf("\nRegistration Successful\n");
-
+           // printf("\nRegistration Successful\n");
             r = 1;
             break;
         case 3:
@@ -98,6 +97,7 @@ void initMenu(struct User *u)
 
 int main()
 {
+    
     struct User u;
     
     initMenu(&u);
