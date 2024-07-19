@@ -3,11 +3,7 @@
 const char *RECORDS = "./data/records.txt";
 
 int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
-{   if (ptr == NULL || r == NULL){
-    return 0;
-    
-    }
-   // printf("is it a infinite loop");
+{  
     return fscanf(ptr, "%d %d %s %d %d/%d/%d %s %d %lf %s",
                   &r->id,
 		  &r->userId,
@@ -19,13 +15,13 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
                   r->country,
                   &r->phone,
                   &r->amount,
-                  r->accountType) != EOF; //return 1 if successful
+                  r->accountType) == 11; //return 1 if successful
 }
 
 void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
 {
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
-            u.id,
+            r.id,
 	    u.id,
 	    u.name,
             r.accountNbr,
@@ -36,6 +32,8 @@ void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
             r.phone,
             r.amount,
             r.accountType);
+
+    // printf("%d %d",u.id, r.accountNbr);        
 }
 
 void stayOrReturn(int notGood, void f(struct User u), struct User u)
@@ -119,15 +117,16 @@ noAccount:
 
     while (getAccountFromFile(pf, userName, &cr))
     {
-        printf("%s %s %d %d",userName, u.name,cr.accountNbr,r.accountNbr);
+        
         if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr)
         {
             printf("✖ This Account already exists for this user\n\n");
             goto noAccount;
         }
     }
+    // rintf("%s %s %d %d",userName, u.name,cr.accountNbr,r.accountNbr);
     
-    r.id = lastId;
+    
     
     
     printf("\nEnter the country:");
@@ -138,9 +137,10 @@ noAccount:
     scanf("%lf", &r.amount);
     printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
     scanf("%s", r.accountType);
-    printf("%d",u.id);
+    // printf("%d",u.id);
     // printf("%s",u.name);
     // printf("%s",u.password);
+    r.id = lastId + 1;
     saveAccountToFile(pf, u, r);
 
     fclose(pf);
@@ -161,7 +161,7 @@ void checkAllAccounts(struct User u)
         if (strcmp(userName, u.name) == 0)
         {
             printf("_____________________\n");
-            printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
+            printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \nCountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
                    r.accountNbr,
                    r.deposit.day,
                    r.deposit.month,
@@ -181,7 +181,7 @@ int getLastId(FILE *ptr)
 
     struct Record r;
     struct User u;
-    int lastId = -1;
+    int lastId;
     while (fscanf(ptr,"%d %d %s %d %d/%d/%d %s %d %2lf %s",
             &r.id,
 	    &u.id,
@@ -195,15 +195,17 @@ int getLastId(FILE *ptr)
             &r.amount,
             r.accountType) == 11){
                 lastId = r.id;
-
-                 // Read and discard the two newlines after each entry
-        int c;
-        while ((c = fgetc(ptr)) != EOF && (char)c != '\n'); // Skip until newline or EOF
-        if (c == EOF) {
-            break; // Break if EOF reached
-        }
             }
 
-    // printf("last index: %d ", lastId);
+    printf("last index: %d ", lastId);
     return lastId;
+
 }
+
+// void updateAcc(struct User u)
+// {
+//     struct  User p;
+//     struct Record r;
+   
+ 
+// }
