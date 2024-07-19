@@ -34,3 +34,8 @@
 + Makefile
 + SQlite; relational database
 
+
+## Challenges to Solve
+1. the primary key in records.txt
+2. the UserID key in records.txt
+3. Account number should be unique.
