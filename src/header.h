@@ -31,13 +31,10 @@ struct User
 
 // authentication functions
 void loginMenu(char a[50], char pass[50]);
-void registerMenu();
+void registerMenu(char a[50], char pass[50]);
 const char *getPassword(struct User u);
 
 // system function
 void createNewAcc(struct User u);
 void mainMenu(struct User u);
 void checkAllAccounts(struct User u);
-
-int checkNameIsUnique(FILE *pt,const char *r);
-int getLastId(FILE *ptr);
