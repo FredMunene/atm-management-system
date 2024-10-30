@@ -1,2 +1,4 @@
-bin
-obj
+*.o
+atm
+records.txt
+users.txt
