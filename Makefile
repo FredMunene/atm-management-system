@@ -1,34 +1,16 @@
-CC = gcc
-CFLAGS = -Wall -Wextra
+objects = src/main.o src/system.o src/auth.o
 
-SRCDIR = src
-#  dir for exec
-BINDIR = bin
-# dir for objects
-OBJDIR = obj
-# list all source code files
-SRCFILES = $(wildcard $(SRCDIR)/*.c)
-# list all objects files '.o'
-OBJFILES = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCFILES))
-EXECUTABLE = atm
+atm : $(objects)
+	cc -o atm $(objects)
 
-.PHONY: all clean directories
-#  directories exists >> creates an executable
-all: directories $(BINDIR)/$(EXECUTABLE)
+main.o : src/header.h
+kbd.o : src/header.h
+command.o : src/header.h
+display.o : src/header.h
+insert.o : src/header.h
+search.o : src/header.h
+files.o : src/header.h
+utils.o : src/header.h
 
-$(BINDIR)/$(EXECUTABLE): $(OBJFILES) | $(BINDIR)
-	$(CC) $(CFLAGS) $(OBJFILES) -o $@
-#  compiles each '.c' file into a '.o' file
-$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BINDIR):
-	mkdir -p $(BINDIR)
-
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
-# ensures directories exists
-directories: | $(BINDIR) $(OBJDIR)
-
-clean:
-	rm -rf $(BINDIR) $(OBJDIR)
+clean :
+	rm -f $(objects)
