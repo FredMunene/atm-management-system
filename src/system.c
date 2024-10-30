@@ -21,8 +21,8 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
 void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
 {
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
-            &r.id,
-	    &u.id,
+            r.id,
+	    u.id,
 	    u.name,
             r.accountNbr,
             r.deposit.month,
@@ -102,6 +102,15 @@ void createNewAcc(struct User u)
     struct Record cr;
     char userName[50];
     FILE *pf = fopen(RECORDS, "a+");
+    FILE *rf = fopen(RECORDS,"r");
+
+
+int recordId = 0;
+    while (fscanf(rf,"%d %*[^'\n]",&r.id) != EOF)
+    {
+        recordId = r.id;
+    }
+    
 
 noAccount:
     system("clear");
@@ -128,6 +137,8 @@ noAccount:
     scanf("%lf", &r.amount);
     printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
     scanf("%s", r.accountType);
+
+    r.id = recordId + 1;
 
     saveAccountToFile(pf, u, r);
 
