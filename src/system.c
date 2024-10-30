@@ -174,3 +174,40 @@ void checkAllAccounts(struct User u)
     fclose(pf);
     success(u);
 }
+
+// save the new user details to users.txt
+int saveUser(int id, char *username, char *password) {
+    FILE *file = fopen("data/users.txt", "a");
+    if (!file) {
+        perror("Could not open users file for writing");
+        return -1;  // Error opening file
+    }
+
+    // Write the new user to the file
+    fprintf(file, "%d %s %s\n", id, username, password);
+    fclose(file);
+
+    return 0;  // Successful save
+}
+// read users.txt to find the highest existing user ID and return the next available ID.
+int determineUserId() {
+    FILE *file = fopen("data/users.txt", "r");
+    if (!file) {
+        perror("Could not open users file for reading");
+        return -1;  // Error opening file
+    }
+
+    int maxId = -1;  // Start with -1 to indicate no users found
+    int id;
+    char username[50], password[50];
+
+    // Read through the file to find the highest ID
+    while (fscanf(file, "%d %s %s", &id, username, password) == 3) {
+        if (id > maxId) {
+            maxId = id;  // Update maxId if a higher ID is found
+        }
+    }
+
+    fclose(file);
+    return maxId + 1;  // Return the next available user ID
+}

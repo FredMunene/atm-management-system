@@ -38,3 +38,6 @@ const char *getPassword(struct User u);
 void createNewAcc(struct User u);
 void mainMenu(struct User u);
 void checkAllAccounts(struct User u);
+
+int saveUser(int id, char *username, char *password);
+int determineUserId();
