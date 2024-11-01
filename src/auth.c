@@ -8,7 +8,7 @@ void loginMenu(char a[50], char pass[50])
     struct termios oflags, nflags;
 
     system("clear");
-    printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Sign Up:");
+    printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Log In:");
     scanf("%s", a);
 
     // disabling echo
@@ -22,7 +22,7 @@ void loginMenu(char a[50], char pass[50])
         perror("tcsetattr");
         return exit(1);
     }
-    printf("\n\n\n\n\n\t\t\t\tEnter the password to sign up:");
+    printf("\n\n\n\n\n\t\t\t\tEnter the password to log in:");
     scanf("%s", pass);
 
     // restore terminal
@@ -81,6 +81,13 @@ void registerMenu( char a[50], char pass[50])
     printf("\n\n\n\n\n\t\t\t\tEnter the password to login:");
     scanf("%s", pass);
 
+        // restore terminal
+    if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
+    {
+        perror("tcsetattr");
+        exit(1);
+    }
+
     FILE *pf = fopen(USERS,"r");
     if (!pf) {
         perror("Failed to open user file");
@@ -111,13 +118,6 @@ void registerMenu( char a[50], char pass[50])
     
     // Save the new User
     if (saveUser(newId, a, pass) == -1){
-        exit(1);
-    }
-
-    // restore terminal
-    if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
-    {
-        perror("tcsetattr");
         exit(1);
     }
 }

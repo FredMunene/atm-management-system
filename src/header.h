@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 struct Date
 {
@@ -38,6 +39,10 @@ const char *getPassword(struct User u);
 void createNewAcc(struct User u);
 void mainMenu(struct User u);
 void checkAllAccounts(struct User u);
+void updateAccount( struct User u);
+
+void updateRecord(FILE *pf, struct Record r);
+void deleteRecord(int accountNbr, char *username);
 
 int saveUser(int id, char *username, char *password);
 int determineUserId();

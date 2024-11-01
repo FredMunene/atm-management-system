@@ -211,3 +211,136 @@ int determineUserId() {
     fclose(file);
     return maxId + 1;  // Return the next available user ID
 }
+
+void updateAccount( struct User u)
+{
+    struct Record r;
+    struct User user;
+    int AccountNum;
+    system("clear");
+
+    printf("\t\t\t===== Update Account for %s=====\n",u.name);
+    printf("\n Enter the account number: ");
+    scanf("%d",&AccountNum);
+
+    // check user has account
+    FILE *pf = fopen(RECORDS,"r+");
+    if (pf == NULL){
+        perror("Could not open records file");
+        return;
+    }
+
+    int accountFound = 0;
+
+    while (getAccountFromFile(pf,user.name,&r)){
+        if (strcmp(u.name,user.name) == 0 && AccountNum == r.accountNbr){
+            accountFound = 1;
+
+            int option;
+            printf("\nChoose the field to change:\n\t-> 1: Phone Number\n\t-> 2: Country\n\n\tEnter your choice(1 or 2): ");
+            scanf("%d", &option);
+
+            switch (option) {
+                case 1:
+                    printf("\nEnter your new phone number:");
+                    scanf("%d",&r.phone);
+                    break;
+                case 2:
+                    printf("\nEnter your new country:");
+                    scanf("%s",r.country);
+                    break;
+                default:
+                    printf("Invalid option selected.\n");
+                    fclose(pf);
+                    return;
+            }
+            // save details back into the file
+            updateRecord(pf,r);
+            break;
+        }
+    }
+
+    fclose(pf);
+
+
+    if (accountFound) {
+        success(u);
+    } else {
+        printf("Account ID not found!\n");
+    }
+
+    // delete previous record
+}
+
+
+void updateRecord(FILE *pf, struct Record r)
+{
+
+    deleteRecord(r.accountNbr, r.name); // Delete the existing record first
+
+    struct User u;
+    *u.name = *r.name;
+    u.id = r.userId;
+    // Open the records file in append mode to add the updated record
+    FILE *file = fopen(RECORDS, "a");
+    if (file == NULL) {
+        perror("Could not open records file");
+        return;
+    }
+
+    saveAccountToFile(pf,u,r);
+
+    // printf("Account updated successfully!\n");
+
+    fclose(file);
+}
+
+void deleteRecord(int accountNbr, char *username)
+{
+    struct Record records[100];
+    int recordCount = 0;
+    int recordFound = 0;
+    FILE *pf  = fopen(RECORDS,"r+");
+
+    if (pf == NULL) {
+        perror("Could not open file");
+        return;
+    }
+
+    while(fscanf(pf, "%d %d %s %d %d/%d/%d %s %d %lf %s\n",&records[recordCount].id, 
+    &records[recordCount].userId, records[recordCount].name, &records[recordCount].accountNbr,
+                  &records[recordCount].deposit.month,&records[recordCount].deposit.day, &records[recordCount].deposit.year, 
+                    records[recordCount].country, &records[recordCount].phone,&records[recordCount].amount, records[recordCount].accountType) != EOF){
+                    recordCount++;
+                   }
+
+    fseek(pf,0,SEEK_SET);
+
+        // Overwrite file with records except the one to delete
+    for (int i = 0; i < recordCount; i++) {
+        if (records[i].accountNbr == accountNbr && strcmp(records[i].name, username) == 0) {
+            recordFound = 1; // Mark that the record was found and should be deleted
+            continue; // Skip writing this record
+        }
+        // Write the remaining records back to the file
+        fprintf(pf, "%d %d %s %d %d/%d/%d %s %d %lf %s\n\n",
+                records[i].id, records[i].userId, records[i].name, records[i].accountNbr,
+                records[i].deposit.day,records[i].deposit.month,records[i].deposit.year,
+                records[i].country, records[i].phone, records[i].amount, records[i].accountType);
+    }
+
+    if (recordFound) {
+        printf("Record with account number %d and username %s deleted successfully!\n", accountNbr, username);
+    } else {
+        printf("Record with account number %d and username %s not found!\n", accountNbr, username);
+    }
+
+    if (recordFound) {
+        // Use ftell to find the current position and truncate the file
+        long currentPos = ftell(pf);
+        ftruncate(fileno(pf), currentPos);
+    
+    }
+
+    fclose(pf);
+}

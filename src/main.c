@@ -24,6 +24,7 @@ void mainMenu(struct User u)
     case 2:
         // student TODO : add your **Update account information** function
         // here
+        updateAccount(u);
         break;
     case 3:
         // student TODO : add your **Check the details of existing accounts** function
@@ -81,8 +82,6 @@ void initMenu(struct User *u)
             r = 1;
             break;
         case 2:
-            // student TODO : add your **Registration** function
-            // here
             registerMenu(u->name, u->password);
             r = 1;
             break;
@@ -90,7 +89,7 @@ void initMenu(struct User *u)
             exit(1);
             break;
         default:
-            printf("Insert a valid operation!\n");
+            printf("Invalid operation!\n");
             exit(1);
         }
     }
