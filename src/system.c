@@ -333,3 +333,65 @@ void updateRecord(struct Record r) {
     printf("\n\t\t✔ Account information updated successfully.\n");
 }
 
+void checkAccounts(struct User u)
+{
+    int accountNbr;
+    struct Record r;
+    char username[50];
+    double interest;
+
+    FILE *pf = fopen(RECORDS,"r");
+    if (pf == NULL) {
+        perror("Could not open records file");
+        return;
+    }
+
+    // ask for account id
+    printf("\nEnter the account number:");
+    scanf("%d", &accountNbr);
+    
+    system("clear");
+    int accountFound = 0;
+    // retrieve account info
+    while (getAccountFromFile(pf,username,&r)) {
+        if (strcmp(username,u.name) == 0 && r.accountNbr == accountNbr){
+            accountFound = 1;
+            printf("Account number:%d\n",r.accountNbr);
+            printf("Deposit Date:%d/%d.%d\n",r.deposit.day,r.deposit.month,r.deposit.year);
+            printf("Country:%s\n",r.country);
+            printf("Phone number%d\n",r.phone);
+            printf("Amount deposited:%.2lf\n",r.amount);
+            printf("Type of Account:%s\n",r.accountType);
+            break;
+        }
+    }
+
+    fclose(pf);
+
+    if (!accountFound) {
+        printf("Account not found.\n");
+        return;
+    }
+    
+    if (strcmp(r.accountType,"fixed01") == 0 ){
+        interest = r.amount * 0.04 / 12;
+        printf("\nYou will get $%.2lf as interest on day %d of every month\n",interest,r.deposit.day);
+    } else if (strcmp(r.accountType,"fixed02") == 0)
+    {
+        interest = r.amount * 0.05 / 12;
+        printf("\nYou will get $%.2lf as interest on day %d of every month\n",interest,r.deposit.day);
+    } else if (strcmp(r.accountType,"fixed03") == 0)
+    {
+        interest = r.amount * 0.08 / 12;
+        printf("\nYou will get $%.2lf as interest on day %d of every month\n",interest,r.deposit.day);
+    }else if (strcmp(r.accountType,"savings") == 0)
+    {
+        interest = r.amount *0.07 / 12;
+        printf("\nYou will get $%.2lf as interest on day %d of every month\n",interest,r.deposit.day);
+    }else if (strcmp(r.accountType,"current") == 0)
+    {
+        printf("\nYou will not get interests because the account is of type current\n");
+    }
+    
+    success(u);
+}
