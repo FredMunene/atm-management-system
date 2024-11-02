@@ -41,8 +41,8 @@ void mainMenu(struct User u);
 void checkAllAccounts(struct User u);
 void updateAccount( struct User u);
 
-void updateRecord(FILE *pf, struct Record r);
-void deleteRecord(int accountNbr, char *username);
+void updateRecord(struct Record r);
+
 
 int saveUser(int id, char *username, char *password);
 int determineUserId();

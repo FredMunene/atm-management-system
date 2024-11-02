@@ -20,6 +20,7 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
 
 void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
 {
+    printf("%s",u.id);
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
             r.id,
 	    u.id,
@@ -111,7 +112,7 @@ int recordId = 0;
         recordId = r.id;
     }
     
-
+fclose(rf);
 noAccount:
     system("clear");
     printf("\t\t\t===== New record =====\n");
@@ -224,7 +225,7 @@ void updateAccount( struct User u)
     scanf("%d",&AccountNum);
 
     // check user has account
-    FILE *pf = fopen(RECORDS,"r+");
+    FILE *pf = fopen(RECORDS,"r");
     if (pf == NULL){
         perror("Could not open records file");
         return;
@@ -254,8 +255,6 @@ void updateAccount( struct User u)
                     fclose(pf);
                     return;
             }
-            // save details back into the file
-            updateRecord(pf,r);
             break;
         }
     }
@@ -264,83 +263,66 @@ void updateAccount( struct User u)
 
 
     if (accountFound) {
+        updateRecord(r);
         success(u);
     } else {
         printf("Account ID not found!\n");
     }
 
-    // delete previous record
 }
 
 
-void updateRecord(FILE *pf, struct Record r)
-{
-
-    deleteRecord(r.accountNbr, r.name); // Delete the existing record first
-
-    struct User u;
-    *u.name = *r.name;
-    u.id = r.userId;
-    // Open the records file in append mode to add the updated record
-    FILE *file = fopen(RECORDS, "a");
-    if (file == NULL) {
-        perror("Could not open records file");
-        return;
-    }
-
-    saveAccountToFile(pf,u,r);
-
-    // printf("Account updated successfully!\n");
-
-    fclose(file);
-}
-
-void deleteRecord(int accountNbr, char *username)
-{
+void updateRecord(struct Record r) {
     struct Record records[100];
+    FILE *pf = fopen(RECORDS, "r");
     int recordCount = 0;
-    int recordFound = 0;
-    FILE *pf  = fopen(RECORDS,"r+");
 
     if (pf == NULL) {
         perror("Could not open file");
         return;
     }
 
-    while(fscanf(pf, "%d %d %s %d %d/%d/%d %s %d %lf %s\n",&records[recordCount].id, 
-    &records[recordCount].userId, records[recordCount].name, &records[recordCount].accountNbr,
-                  &records[recordCount].deposit.month,&records[recordCount].deposit.day, &records[recordCount].deposit.year, 
-                    records[recordCount].country, &records[recordCount].phone,&records[recordCount].amount, records[recordCount].accountType) != EOF){
-                    recordCount++;
-                   }
-
-    fseek(pf,0,SEEK_SET);
-
-        // Overwrite file with records except the one to delete
-    for (int i = 0; i < recordCount; i++) {
-        if (records[i].accountNbr == accountNbr && strcmp(records[i].name, username) == 0) {
-            recordFound = 1; // Mark that the record was found and should be deleted
-            continue; // Skip writing this record
-        }
-        // Write the remaining records back to the file
-        fprintf(pf, "%d %d %s %d %d/%d/%d %s %d %lf %s\n\n",
-                records[i].id, records[i].userId, records[i].name, records[i].accountNbr,
-                records[i].deposit.day,records[i].deposit.month,records[i].deposit.year,
-                records[i].country, records[i].phone, records[i].amount, records[i].accountType);
+    // Read records from the file
+    while (fscanf(pf, "%d %d %s %d %d/%d/%d %s %d %lf %s\n",
+                  &records[recordCount].id, &records[recordCount].userId, records[recordCount].name, 
+                  &records[recordCount].accountNbr, &records[recordCount].deposit.month, 
+                  &records[recordCount].deposit.day, &records[recordCount].deposit.year, 
+                  records[recordCount].country, &records[recordCount].phone, 
+                  &records[recordCount].amount, records[recordCount].accountType) != EOF) {
+        recordCount++;
     }
-
-    if (recordFound) {
-        printf("Record with account number %d and username %s deleted successfully!\n", accountNbr, username);
-    } else {
-        printf("Record with account number %d and username %s not found!\n", accountNbr, username);
-    }
-
-    if (recordFound) {
-        // Use ftell to find the current position and truncate the file
-        long currentPos = ftell(pf);
-        ftruncate(fileno(pf), currentPos);
-    
-    }
-
     fclose(pf);
+
+    printf("the name is%s", r.name);
+    // Update matching record
+    for (int i = 0; i < recordCount; i++) {
+        if (1) {
+            // strcpy(records[i].country, r.country);
+            // records[i].phone = r.phone;
+            // if (strcmp(records[i].name,r.name)== 0)
+            {
+                 printf(":%s:%s:\n", records[i].name,r.name);
+            }
+           
+        }
+    }
+
+
+    // Write updated records to the file
+    FILE *file = fopen(RECORDS, "w");
+    if (file == NULL) {
+        perror("\n\t\tFailed to open file");
+        return;
+    }
+
+    for (int i = 0; i < recordCount; i++) {
+        struct User u;
+        u.id = records[i].userId;
+        strcpy(u.name, records[i].name);
+        saveAccountToFile(file, u, records[i]);
+    }
+    fclose(file);
+
+    printf("\n\t\t✔ Account information updated successfully.\n");
 }
+
