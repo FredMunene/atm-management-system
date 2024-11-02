@@ -137,8 +137,7 @@ noAccount:
     printf("\nEnter amount to deposit: $");
     scanf("%lf", &r.amount);
 
-    badchoice:
-    printf("\nChoose the type of account:\n\t1 -> saving\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice(1,2,3,4 or 5):");
+    printf("\nChoose the type of account:\n\t1 -> savings\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice(1,2,3,4 or 5):");
     int option;
     scanf("%d", &option);
     switch (option)
@@ -159,7 +158,8 @@ noAccount:
         strcpy(r.accountType,"fixed03");
         break;
     default:
-        goto badchoice;
+        strcpy(r.accountType,"savings");
+        printf("\nAccount default set as Savings\n");
         break;
     }
 
@@ -418,4 +418,101 @@ void checkAccounts(struct User u)
     }
     
     success(u);
+}
+
+void makeTransaction(struct User u)
+{
+    struct User user;
+    struct Record r;
+    int option;
+    int accNbr;
+    int accountFound = 0;
+
+    FILE *file = fopen(RECORDS,"r");
+    if (file == NULL) {
+        perror("Could not open records file");
+        return;
+    }
+    // obtain account nbr
+    // obtain record 
+    printf("\nEnter the account number of the customer:");
+    scanf("%d",&accNbr);
+
+    // check user and acccount nbr exists
+    // type of transaction
+    while (getAccountFromFile(file,user.name,&r)){
+        if (strcmp(u.name,user.name) == 0 && accNbr == r.accountNbr)
+        {
+            strcpy(r.name,user.name);
+            accountFound = 1;
+            break;
+        }
+    }
+
+    fclose(file);
+
+    
+
+    if (accountFound){
+        // check type of account
+        if (strcmp(r.accountType,"fixed01") == 0 || 
+            strcmp(r.accountType,"fixed02") == 0 || 
+            strcmp(r.accountType,"fixed03") == 0 ) 
+        {
+            printf("You cannot deposit or withdraw cash in fixed acccounts!\n");
+            stayOrReturn(0,makeTransaction,u);
+            return;
+        }
+        printf("\nDo you want to:\n\t\t1->Withdraw\n\t\t2->Deposit\nEnter your choice:");
+        scanf("%d",&option);
+
+        switch (option)
+        {
+        case 1: {
+            double withdrawAmt;
+            printf("Enter the amount:");
+            scanf("%lf",&withdrawAmt);
+            if (withdrawAmt > r.amount){
+                printf("The amount you chose to withdraw is superior to your available balance!\n");
+                stayOrReturn(0,makeTransaction,u);
+                return;
+            } else if (withdrawAmt <= 0.0){
+                printf("The amount you chose to withdraw should be greater than $0.0\n");
+                stayOrReturn(0,makeTransaction,u);
+                return;
+            } else{
+                r.amount = r.amount - withdrawAmt;
+                updateRecord(r);
+                printf("%s:Successfully withdrawn $%.2lf. New balance: $%.2lf\n",r.name, withdrawAmt, r.amount);
+                success(u);
+            }
+            break;
+        }
+        case 2:{
+            // amount to deposit
+            // check for overflow :TODO
+            double depositAmt;
+            printf("Enter the amount:");
+            scanf("%lf",&depositAmt);
+            if (depositAmt <= 0.0){
+                printf("The amount you chose to deposit is less than or equal to $0.0");
+                stayOrReturn(0,makeTransaction,u);
+                return;
+            }
+            r.amount +=depositAmt;
+            updateRecord(r);
+            success(u);
+            break;
+        }
+        default:
+            break;
+        }
+
+    } else{
+        // printf("Account not Found");
+        stayOrReturn(0,makeTransaction,u);
+        return;
+        
+    }
+   
 }
