@@ -106,10 +106,6 @@ void registerMenu( char a[50], char pass[50])
     }
     fclose(pf);
 
-    //     while(fscanf(pf, "%d %s %s") != EOF)
-    // {
-    //     /* code */
-    // }
     // Determine new user ID
     int newId = determineUserId();
     if (newId == -1) {

@@ -46,3 +46,4 @@ void updateRecord(struct Record r);
 
 int saveUser(int id, char *username, char *password);
 int determineUserId();
+int getUserId(struct User u);

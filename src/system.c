@@ -107,10 +107,10 @@ void createNewAcc(struct User u)
 
 
 int recordId = 0;
-    while (fscanf(rf,"%d %*[^'\n]",&r.id) != EOF)
-    {
-        recordId = r.id;
-    }
+while (fscanf(rf,"%d %*[^'\n]",&r.id) != EOF)
+{
+    recordId = r.id;
+}
     
 fclose(rf);
 noAccount:
@@ -139,6 +139,7 @@ noAccount:
     printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
     scanf("%s", r.accountType);
 
+    u.id = getUserId(u);
     r.id = recordId + 1;
 
     saveAccountToFile(pf, u, r);
@@ -211,6 +212,20 @@ int determineUserId() {
 
     fclose(file);
     return maxId + 1;  // Return the next available user ID
+}
+
+int getUserId(struct User u){
+    FILE *pf = fopen("data/users.txt","r");
+    struct User user;
+    while (fscanf(pf, "%d %s %s", &user.id, user.name, user.password) == 3)
+    {
+        if (strcmp(u.name,user.name) == 0){
+            fclose(pf);
+            return user.id;
+            
+        }
+    }
+    fclose(pf);
 }
 
 void updateAccount( struct User u)
