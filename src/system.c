@@ -136,8 +136,32 @@ noAccount:
     scanf("%d", &r.phone);
     printf("\nEnter amount to deposit: $");
     scanf("%lf", &r.amount);
-    printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
-    scanf("%s", r.accountType);
+
+    badchoice:
+    printf("\nChoose the type of account:\n\t1 -> saving\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice(1,2,3,4 or 5):");
+    int option;
+    scanf("%d", &option);
+    switch (option)
+    {
+    case 1:
+        strcpy(r.accountType,"savings");
+        break;
+    case 2:
+        strcpy(r.accountType,"current");
+        break;
+    case 3:
+        strcpy(r.accountType,"fixed01");
+        break;
+    case 4:
+        strcpy(r.accountType,"fixed02");
+        break;
+    case 5:
+        strcpy(r.accountType,"fixed03");
+        break;
+    default:
+        goto badchoice;
+        break;
+    }
 
     u.id = getUserId(u);
     r.id = recordId + 1;
