@@ -20,7 +20,7 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
 
 void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
 {
-    printf("%s",u.id);
+
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
             r.id,
 	    u.id,
@@ -236,33 +236,32 @@ void updateAccount( struct User u)
     while (getAccountFromFile(pf,user.name,&r)){
         if (strcmp(u.name,user.name) == 0 && AccountNum == r.accountNbr){
             accountFound = 1;
-
-            int option;
-            printf("\nChoose the field to change:\n\t-> 1: Phone Number\n\t-> 2: Country\n\n\tEnter your choice(1 or 2): ");
-            scanf("%d", &option);
-
-            switch (option) {
-                case 1:
-                    printf("\nEnter your new phone number:");
-                    scanf("%d",&r.phone);
-                    break;
-                case 2:
-                    printf("\nEnter your new country:");
-                    scanf("%s",r.country);
-                    break;
-                default:
-                    printf("Invalid option selected.\n");
-                    fclose(pf);
-                    return;
-            }
             break;
         }
     }
 
     fclose(pf);
-
+    strcpy(r.name,user.name);
 
     if (accountFound) {
+
+        int option;
+        printf("\nChoose the field to change:\n\t-> 1: Phone Number\n\t-> 2: Country\n\n\tEnter your choice(1 or 2): ");
+        scanf("%d", &option);
+        switch (option) {
+             case 1:
+                 printf("\nEnter your new phone number:");
+                 scanf("%d",&r.phone);
+                 break;
+             case 2:
+                 printf("\nEnter your new country:");
+                 scanf("%s",r.country);
+                 break;
+             default:
+                 printf("Invalid option selected.\n");
+                 fclose(pf);
+                 return;
+        }
         updateRecord(r);
         success(u);
     } else {
@@ -293,20 +292,13 @@ void updateRecord(struct Record r) {
     }
     fclose(pf);
 
-    printf("the name is%s", r.name);
     // Update matching record
-    for (int i = 0; i < recordCount; i++) {
-        if (1) {
-            // strcpy(records[i].country, r.country);
-            // records[i].phone = r.phone;
-            // if (strcmp(records[i].name,r.name)== 0)
-            {
-                 printf(":%s:%s:\n", records[i].name,r.name);
-            }
-           
-        }
+    for (int i = 0; i < recordCount; i++) {            
+        if (strcmp(records[i].name,r.name)== 0 && records[i].accountNbr == r.accountNbr){
+           strcpy(records[i].country, r.country);
+            records[i].phone = r.phone; 
+        }            
     }
-
 
     // Write updated records to the file
     FILE *file = fopen(RECORDS, "w");
