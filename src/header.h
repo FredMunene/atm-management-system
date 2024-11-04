@@ -42,10 +42,12 @@ void checkAllAccounts(struct User u);
 void updateAccount( struct User u);
 void checkAccounts(struct User u);
 void makeTransaction(struct User u);
-
+void deleteAccount(struct User u);
 void updateRecord(struct Record r);
 
 
 int saveUser(int id, char *username, char *password);
 int determineUserId();
 int getUserId(struct User u);
+void displayMessageWithDelay();
+void deleteRecord();

@@ -1,5 +1,6 @@
 #include "header.h"
 
+
 const char *RECORDS = "./data/records.txt";
 
 int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
@@ -352,6 +353,7 @@ void updateRecord(struct Record r) {
     FILE *pf = fopen(RECORDS, "r");
     int recordCount = 0;
 
+    printf("\n%s:%f",r.name,r.amount);
     if (pf == NULL) {
         perror("Could not open file");
         return;
@@ -373,6 +375,7 @@ void updateRecord(struct Record r) {
         if (strcmp(records[i].name,r.name)== 0 && records[i].accountNbr == r.accountNbr){
            strcpy(records[i].country, r.country);
             records[i].phone = r.phone; 
+            records[i].amount = r.amount;
         }            
     }
 
@@ -454,7 +457,7 @@ void checkAccounts(struct User u)
         printf("\nYou will not get interests because the account is of type current\n");
     }
     
-    success(u);
+    stayOrReturn(1,checkAccounts,u);
 }
 
 void makeTransaction(struct User u)
@@ -519,8 +522,9 @@ void makeTransaction(struct User u)
                 return;
             } else{
                 r.amount = r.amount - withdrawAmt;
+                // printf("Withdraw Name:%s and Account Nbr:%d",r.name, r.accountNbr);
                 updateRecord(r);
-                printf("%s:Successfully withdrawn $%.2lf. New balance: $%.2lf\n",r.name, withdrawAmt, r.amount);
+                printf("%s: Successfully withdrawn $%.2lf. New balance: $%.2lf\n",r.name, withdrawAmt, r.amount);
                 success(u);
             }
             break;
@@ -533,23 +537,138 @@ void makeTransaction(struct User u)
             scanf("%lf",&depositAmt);
             if (depositAmt <= 0.0){
                 printf("The amount you chose to deposit is less than or equal to $0.0");
+                // sleep(3);
                 stayOrReturn(0,makeTransaction,u);
                 return;
             }
             r.amount +=depositAmt;
+            printf("Deposit Name:%s and Account Nbr:%d",r.name, r.accountNbr);
             updateRecord(r);
             success(u);
             break;
         }
         default:
+            printf("Invalid option selected.\n");
+            stayOrReturn(1,makeTransaction,u);
             break;
         }
 
     } else{
-        // printf("Account not Found");
+        printf("Account not Found");
+        while (getchar() != '\n');  // Clear invalid input from buffer
         stayOrReturn(0,makeTransaction,u);
-        return;
-        
     }
    
+}
+
+
+// void displayMessageWithDelay() {
+//     printf("The amount you chose to deposit is less than or equal to $0.0\n");
+//     sleep(3); // Sleep for 3 seconds
+// }
+
+void deleteAccount(struct User u)
+{
+
+    struct User user;
+    struct Record r;
+    int accountFound = 0;
+    int accNbr;
+    FILE *file = fopen(RECORDS,"r");
+    if (file == NULL) {
+        perror("Could not open records file");
+        return;
+    }
+    printf("\nEnter the account number of the customer:");
+    scanf("%d",&accNbr);
+
+    // check user and account nbr exists
+    // type of transaction
+    while (getAccountFromFile(file,user.name,&r)){
+        if (strcmp(u.name,user.name) == 0 && accNbr == r.accountNbr)
+        {
+            strcpy(r.name,user.name);
+            accountFound = 1;
+            break;
+        }
+    }
+
+    fclose(file);
+
+    
+
+    if (accountFound){
+        // delete record
+        // print out the details
+        system("clear");
+        printf("\t\t====== Deleted account for user, %s =====\n\n", u.name);
+        printf("_____________________\n");
+        printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
+               r.accountNbr,
+               r.deposit.day,
+               r.deposit.month,
+               r.deposit.year,
+               r.country,
+               r.phone,
+               r.amount,
+               r.accountType);
+
+    deleteRecord(r);
+    stayOrReturn(1,deleteAccount,u);
+
+    } else {
+        while (getchar() != '\n');
+        stayOrReturn(0,deleteAccount,u);
+    }
+}
+
+void deleteRecord(struct Record r) {
+    struct Record records[100];
+    FILE *pf = fopen(RECORDS, "r");
+    int recordCount = 0;
+    int recordToDelete;
+
+    // printf("\n%s:%f",r.name,r.amount);
+    if (pf == NULL) {
+        perror("Could not open file");
+        return;
+    }
+
+    // Read records from the file
+    while (fscanf(pf, "%d %d %s %d %d/%d/%d %s %d %lf %s\n",
+                  &records[recordCount].id, &records[recordCount].userId, records[recordCount].name, 
+                  &records[recordCount].accountNbr, &records[recordCount].deposit.month, 
+                  &records[recordCount].deposit.day, &records[recordCount].deposit.year, 
+                  records[recordCount].country, &records[recordCount].phone, 
+                  &records[recordCount].amount, records[recordCount].accountType) != EOF) {
+        recordCount++;
+    }
+    fclose(pf);
+
+    // Update matching record
+    for (int i = 0; i < recordCount; i++) {            
+        if (strcmp(records[i].name,r.name)== 0 && records[i].accountNbr == r.accountNbr){
+           recordToDelete = i;
+        }            
+    }
+
+   // Write updated records to the file
+    FILE *file = fopen(RECORDS, "w");
+    if (file == NULL) {
+        perror("\n\t\tFailed to open file");
+        return;
+    }
+
+    for (int i = 0; i < recordCount; i++) {
+        struct User u;
+        u.id = records[i].userId;
+        strcpy(u.name, records[i].name);
+        if (i != recordToDelete){
+            saveAccountToFile(file, u, records[i]);
+        }
+        
+    }
+    fclose(file);
+
+    printf("\n\t\t✔ Account deleted successfully.\n");
 }
