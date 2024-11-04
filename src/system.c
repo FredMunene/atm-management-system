@@ -99,78 +99,115 @@ invalid:
 
 void createNewAcc(struct User u)
 {
-    struct Record r;
-    struct Record cr;
+    struct Record r, cr;
     char userName[50];
     FILE *pf = fopen(RECORDS, "a+");
-    FILE *rf = fopen(RECORDS,"r");
-
-
-int recordId = 0;
-while (fscanf(rf,"%d %*[^'\n]",&r.id) != EOF)
-{
-    recordId = r.id;
-}
-    
-fclose(rf);
-noAccount:
-    system("clear");
-    printf("\t\t\t===== New record =====\n");
-
-    printf("\nEnter today's date(mm/dd/yyyy):");
-    scanf("%d/%d/%d", &r.deposit.month, &r.deposit.day, &r.deposit.year);
-    printf("\nEnter the account number:");
-    scanf("%d", &r.accountNbr);
-
-    while (getAccountFromFile(pf, userName, &cr))
+    if (!pf)
     {
-        if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr)
+        printf("Error: Unable to open records file.\n");
+        return;
+    }
+
+    // Determine the latest record ID
+    int recordId = 0;
+    FILE *rf = fopen(RECORDS, "r");
+    if (rf)
+    {
+        while (fscanf(rf, "%d %*[^'\n]", &r.id) != EOF)
         {
-            printf("✖ This Account already exists for this user\n\n");
-            goto noAccount;
+            recordId = r.id;
         }
+        fclose(rf);
     }
-    printf("\nEnter the country:");
-    scanf("%s", r.country);
-    printf("\nEnter the phone number:");
-    scanf("%d", &r.phone);
-    printf("\nEnter amount to deposit: $");
-    scanf("%lf", &r.amount);
-
-    printf("\nChoose the type of account:\n\t1 -> savings\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice(1,2,3,4 or 5):");
-    int option;
-    scanf("%d", &option);
-    switch (option)
+    
+    int validEntry = 0;
+    do
     {
-    case 1:
-        strcpy(r.accountType,"savings");
-        break;
-    case 2:
-        strcpy(r.accountType,"current");
-        break;
-    case 3:
-        strcpy(r.accountType,"fixed01");
-        break;
-    case 4:
-        strcpy(r.accountType,"fixed02");
-        break;
-    case 5:
-        strcpy(r.accountType,"fixed03");
-        break;
-    default:
-        strcpy(r.accountType,"savings");
-        printf("\nAccount default set as Savings\n");
-        break;
-    }
+        system("clear");
+        printf("\t\t\t===== New Record =====\n");
 
-    u.id = getUserId(u);
-    r.id = recordId + 1;
+        printf("\nEnter today's date (mm/dd/yyyy): ");
+        if (scanf("%d/%d/%d", &r.deposit.month, &r.deposit.day, &r.deposit.year) != 3)
+        {
+            printf("Invalid date format. Please enter as mm/dd/yyyy.\n");
+            while (getchar() != '\n');  // Clear invalid input from buffer
+            continue;
+        }
 
-    saveAccountToFile(pf, u, r);
+        printf("\nEnter the account number: ");
+        if (scanf("%d", &r.accountNbr) != 1)
+        {
+            printf("Invalid account number. Try again.\n");
+            while (getchar() != '\n');  // Clear invalid input from buffer
+            continue;
+        }
 
-    fclose(pf);
-    success(u);
+        // Check if account already exists for the user
+        int accountExists = 0;
+        rewind(pf);
+        while (getAccountFromFile(pf, userName, &cr))
+        {
+            if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr)
+            {
+                printf("✖ This Account already exists for this user.\n\n");
+                accountExists = 1;
+                break;
+            }
+        }
+        if (accountExists) continue;
+
+        // Gather other details
+        printf("\nEnter the country: ");
+        scanf("%s", r.country);
+        printf("\nEnter the phone number: ");
+        if (scanf("%d", &r.phone) != 1)
+        {
+            printf("Invalid phone number. Try again.\n");
+            while (getchar() != '\n');  // Clear invalid input from buffer
+            continue;
+        }
+        printf("\nEnter amount to deposit: $");
+        if (scanf("%lf", &r.amount) != 1 || r.amount < 0)
+        {
+            printf("Invalid amount. Try again.\n");
+            while (getchar() != '\n');  // Clear invalid input from buffer
+            continue;
+        }
+
+        printf("\nChoose the type of account:\n\t1 -> savings\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice (1, 2, 3, 4, or 5): ");
+        int option;
+        if (scanf("%d", &option) != 1)
+        {
+            printf("Invalid choice. Setting account type as 'savings'.\n");
+            option = 1;
+            while (getchar() != '\n');
+        }
+
+        switch (option)
+        {
+        case 1: strcpy(r.accountType, "savings"); break;
+        case 2: strcpy(r.accountType, "current"); break;
+        case 3: strcpy(r.accountType, "fixed01"); break;
+        case 4: strcpy(r.accountType, "fixed02"); break;
+        case 5: strcpy(r.accountType, "fixed03"); break;
+        default: 
+            strcpy(r.accountType, "savings");
+            printf("\nAccount type defaulted to Savings.\n");
+            break;
+        }
+
+        // Set record ID and user ID, then save account
+        u.id = getUserId(u);
+        r.id = recordId + 1;
+
+        saveAccountToFile(pf, u, r);
+        fclose(pf);
+        success(u);
+        validEntry = 1;
+
+    } while (!validEntry);
 }
+
 
 void checkAllAccounts(struct User u)
 {
@@ -438,7 +475,7 @@ void makeTransaction(struct User u)
     printf("\nEnter the account number of the customer:");
     scanf("%d",&accNbr);
 
-    // check user and acccount nbr exists
+    // check user and account nbr exists
     // type of transaction
     while (getAccountFromFile(file,user.name,&r)){
         if (strcmp(u.name,user.name) == 0 && accNbr == r.accountNbr)
@@ -459,7 +496,7 @@ void makeTransaction(struct User u)
             strcmp(r.accountType,"fixed02") == 0 || 
             strcmp(r.accountType,"fixed03") == 0 ) 
         {
-            printf("You cannot deposit or withdraw cash in fixed acccounts!\n");
+            printf("You cannot deposit or withdraw cash in fixed accounts!\n");
             stayOrReturn(0,makeTransaction,u);
             return;
         }
