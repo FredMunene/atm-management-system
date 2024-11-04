@@ -41,6 +41,7 @@ void mainMenu(struct User u)
         break;
     case 6:
         // student TODO : add your **Remove existing account** function
+        deleteAccount(u);
         // here
         break;
     case 7:
@@ -72,7 +73,8 @@ void initMenu(struct User *u)
         {
         case 1:
             loginMenu(u->name, u->password);
-            if (strcmp(u->password, getPassword(*u)) == 0)
+            const char *storedPassword = getPassword(*u);
+            if (strcmp(u->password, storedPassword) == 0 && storedPassword != NULL )
             {
                 printf("\n\nPassword Match!");
             }
