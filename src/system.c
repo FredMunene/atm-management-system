@@ -288,6 +288,7 @@ int getUserId(struct User u){
         }
     }
     fclose(pf);
+    return -1;
 }
 
 void updateAccount( struct User u)
@@ -339,7 +340,8 @@ void updateAccount( struct User u)
                  fclose(pf);
                  return;
         }
-        updateRecord(r);
+        updateRecord(r,u);
+        printf("\n\t\t✔ Account information updated successfully.\n");
         success(u);
     } else {
         printf("Account ID not found!\n");
@@ -348,12 +350,12 @@ void updateAccount( struct User u)
 }
 
 
-void updateRecord(struct Record r) {
+void updateRecord(struct Record r,struct User u) {
     struct Record records[100];
     FILE *pf = fopen(RECORDS, "r");
     int recordCount = 0;
 
-    printf("\n%s:%f",r.name,r.amount);
+    printf("\n%s:%s:",u.name,r.name);
     if (pf == NULL) {
         perror("Could not open file");
         return;
@@ -376,6 +378,8 @@ void updateRecord(struct Record r) {
            strcpy(records[i].country, r.country);
             records[i].phone = r.phone; 
             records[i].amount = r.amount;
+            strcpy(records[i].name, u.name); 
+            records[i].userId = u.id;
         }            
     }
 
@@ -387,14 +391,12 @@ void updateRecord(struct Record r) {
     }
 
     for (int i = 0; i < recordCount; i++) {
-        struct User u;
-        u.id = records[i].userId;
-        strcpy(u.name, records[i].name);
+        struct User user;
+        user.id = records[i].id;
+        strcpy(user.name, records[i].name);
         saveAccountToFile(file, u, records[i]);
     }
     fclose(file);
-
-    printf("\n\t\t✔ Account information updated successfully.\n");
 }
 
 void checkAccounts(struct User u)
@@ -420,12 +422,7 @@ void checkAccounts(struct User u)
     while (getAccountFromFile(pf,username,&r)) {
         if (strcmp(username,u.name) == 0 && r.accountNbr == accountNbr){
             accountFound = 1;
-            printf("Account number:%d\n",r.accountNbr);
-            printf("Deposit Date:%d/%d.%d\n",r.deposit.day,r.deposit.month,r.deposit.year);
-            printf("Country:%s\n",r.country);
-            printf("Phone number%d\n",r.phone);
-            printf("Amount deposited:%.2lf\n",r.amount);
-            printf("Type of Account:%s\n",r.accountType);
+            printAccountDetails(r);
             break;
         }
     }
@@ -523,7 +520,7 @@ void makeTransaction(struct User u)
             } else{
                 r.amount = r.amount - withdrawAmt;
                 // printf("Withdraw Name:%s and Account Nbr:%d",r.name, r.accountNbr);
-                updateRecord(r);
+                updateRecord(r,u);
                 printf("%s: Successfully withdrawn $%.2lf. New balance: $%.2lf\n",r.name, withdrawAmt, r.amount);
                 success(u);
             }
@@ -542,8 +539,8 @@ void makeTransaction(struct User u)
                 return;
             }
             r.amount +=depositAmt;
-            printf("Deposit Name:%s and Account Nbr:%d",r.name, r.accountNbr);
-            updateRecord(r);
+            // printf("Deposit Name:%s and Account Nbr:%d",r.name, r.accountNbr);
+            updateRecord(r,u);
             success(u);
             break;
         }
@@ -602,16 +599,7 @@ void deleteAccount(struct User u)
         // print out the details
         system("clear");
         printf("\t\t====== Deleted account for user, %s =====\n\n", u.name);
-        printf("_____________________\n");
-        printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
-               r.accountNbr,
-               r.deposit.day,
-               r.deposit.month,
-               r.deposit.year,
-               r.country,
-               r.phone,
-               r.amount,
-               r.accountType);
+        printAccountDetails(r);
 
     deleteRecord(r);
     stayOrReturn(1,deleteAccount,u);
@@ -671,4 +659,76 @@ void deleteRecord(struct Record r) {
     fclose(file);
 
     printf("\n\t\t✔ Account deleted successfully.\n");
+}
+
+void transferAccount(struct User u)
+{
+    int accNbr;
+    struct User user;
+    struct Record r;
+    int accountFound = 0;
+    FILE *file = fopen(RECORDS,"r");
+
+    printf("Enter the account number you want to transfer ownership:");
+    scanf("%d",&accNbr);
+
+    if (file == NULL) {
+        perror("Could not open file");
+        return;
+    }
+
+    // Read records from the file
+    while (getAccountFromFile(file,user.name,&r)){
+        if (strcmp(u.name,user.name) == 0 && accNbr == r.accountNbr)
+        {
+            // strcpy(r.name,user.name);
+            accountFound = 1;
+            break;
+        }
+    }
+
+    fclose(file);
+
+    if (accountFound){
+
+        printf("\t\t====== Account for user:%s =====\n\n", u.name);
+        printAccountDetails(r);
+
+        printf("\nWhich user you want to transfer ownership to (user name):");
+        scanf("%49s",user.name);
+
+        int userId = getUserId(user);
+        if ( userId == -1){
+            printf("User not Found");
+            return;
+            
+        } else {
+            // strcpy(u.name,user.name);
+            user.id = userId;
+            r.id = userId;
+            updateRecord(r,user);
+            success(u);
+        }
+
+    } else{
+
+        stayOrReturn(0,transferAccount,u);
+    }
+
+
+
+}
+
+void printAccountDetails(struct Record r){
+    
+        printf("_____________________\n");
+        printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
+               r.accountNbr,
+               r.deposit.day,
+               r.deposit.month,
+               r.deposit.year,
+               r.country,
+               r.phone,
+               r.amount,
+               r.accountType);
 }
