@@ -51,3 +51,6 @@ int determineUserId();
 int getUserId(struct User u);
 void displayMessageWithDelay();
 void deleteRecord();
+void printAccountDetails(struct Record r);
+
+int loadRecords(FILE *file, struct Record *records);
