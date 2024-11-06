@@ -43,7 +43,7 @@ void updateAccount( struct User u);
 void checkAccounts(struct User u);
 void makeTransaction(struct User u);
 void deleteAccount(struct User u);
-void updateRecord(struct Record r,struct User u);
+void updateRecord(struct Record r);
 void transferAccount(struct User u);
 
 int saveUser(int id, char *username, char *password);

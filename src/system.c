@@ -340,8 +340,7 @@ void updateAccount( struct User u)
                  fclose(pf);
                  return;
         }
-        updateRecord(r,u);
-        printf("\n\t\t✔ Account information updated successfully.\n");
+        updateRecord(r);
         success(u);
     } else {
         printf("Account ID not found!\n");
@@ -350,12 +349,12 @@ void updateAccount( struct User u)
 }
 
 
-void updateRecord(struct Record r,struct User u) {
+void updateRecord(struct Record r) {
     struct Record records[100];
     FILE *pf = fopen(RECORDS, "r");
     int recordCount = 0;
 
-    printf("\n%s:%s:",u.name,r.name);
+
     if (pf == NULL) {
         perror("Could not open file");
         return;
@@ -375,11 +374,9 @@ void updateRecord(struct Record r,struct User u) {
     // Update matching record
     for (int i = 0; i < recordCount; i++) {            
         if (strcmp(records[i].name,r.name)== 0 && records[i].accountNbr == r.accountNbr){
-           strcpy(records[i].country, r.country);
-            records[i].phone = r.phone; 
-            records[i].amount = r.amount;
-            strcpy(records[i].name, u.name); 
-            records[i].userId = u.id;
+           strcpy(records[i].country, r.country); // change country
+            records[i].phone = r.phone; // change phone number
+            records[i].amount = r.amount; // change amount
         }            
     }
 
@@ -392,9 +389,9 @@ void updateRecord(struct Record r,struct User u) {
 
     for (int i = 0; i < recordCount; i++) {
         struct User user;
-        user.id = records[i].id;
-        strcpy(user.name, records[i].name);
-        saveAccountToFile(file, u, records[i]);
+        user.id = records[i].userId; // id of user
+        strcpy(user.name, records[i].name); // name of user
+        saveAccountToFile(file, user, records[i]);
     }
     fclose(file);
 }
@@ -520,7 +517,7 @@ void makeTransaction(struct User u)
             } else{
                 r.amount = r.amount - withdrawAmt;
                 // printf("Withdraw Name:%s and Account Nbr:%d",r.name, r.accountNbr);
-                updateRecord(r,u);
+                updateRecord(r);
                 printf("%s: Successfully withdrawn $%.2lf. New balance: $%.2lf\n",r.name, withdrawAmt, r.amount);
                 success(u);
             }
@@ -539,8 +536,7 @@ void makeTransaction(struct User u)
                 return;
             }
             r.amount +=depositAmt;
-            // printf("Deposit Name:%s and Account Nbr:%d",r.name, r.accountNbr);
-            updateRecord(r,u);
+            updateRecord(r);
             success(u);
             break;
         }
@@ -602,6 +598,7 @@ void deleteAccount(struct User u)
         printAccountDetails(r);
 
     deleteRecord(r);
+    printf("\n\t\t✔ Account deleted successfully.\n");
     stayOrReturn(1,deleteAccount,u);
 
     } else {
@@ -641,8 +638,8 @@ void deleteRecord(struct Record r) {
     }
 
    // Write updated records to the file
-    FILE *file = fopen(RECORDS, "w");
-    if (file == NULL) {
+    FILE *rf = fopen(RECORDS, "w");
+    if (rf == NULL) {
         perror("\n\t\tFailed to open file");
         return;
     }
@@ -652,13 +649,108 @@ void deleteRecord(struct Record r) {
         u.id = records[i].userId;
         strcpy(u.name, records[i].name);
         if (i != recordToDelete){
-            saveAccountToFile(file, u, records[i]);
-        }
-        
+            saveAccountToFile(rf, u, records[i]);
+        }   
     }
-    fclose(file);
+    fclose(pf);
+}
 
-    printf("\n\t\t✔ Account deleted successfully.\n");
+void transferAccount(struct User u)
+{ 
+    int accNbr;
+    struct User newOwner;
+    struct Record userRecord;
+    struct Record records[100];
+    int recordCount = 0;
+    int accountFound = 0;
+
+    printf("Enter the account number you want to transfer ownership:");
+    scanf("%d",&accNbr);
+
+    FILE *file = fopen(RECORDS,"a+");
+    if (file == NULL) {
+        perror("Could not open file");
+        return;
+    }  
+    // Load records into memory
+    recordCount = loadRecords(file,records);
+
+    // check account exists
+    for (int i = 0; i < recordCount; i++){
+        if (strcmp(records[i].name,u.name)==0 && records[i].accountNbr == accNbr){
+            accountFound = 1;
+            userRecord = records[i];
+        }
+    }
+
+   
+    if (accountFound){
+
+        printf("\t\t====== Account for user:%s =====\n\n", u.name);
+        printAccountDetails(userRecord);
+
+        printf("\nWhich user you want to transfer ownership to (user name):");
+        scanf("%49s",newOwner.name);
+
+        // IF USER IS PRESENT || IF USER HAS AN ACCOUNT WITH SAME NUMBER:: TODO
+        int userId = getUserId(newOwner);
+        printf("%d",userId);
+        if ( userId == -1){
+            printf("User not Found");
+            stayOrReturn(0,transferAccount,u);
+            return;
+            
+        } else {
+            // delete that account
+            deleteRecord(userRecord);
+
+            // Update matching record
+            strcpy(userRecord.name,newOwner.name);
+            newOwner.id = userId;
+            
+            // save account to file
+            saveAccountToFile(file, newOwner, userRecord);
+        
+            fclose(file);                        
+            success(u);
+        }
+
+    } else{
+
+        //check user has that account, if not
+        printf("\n\t\t No account found");
+        stayOrReturn(0,transferAccount,u);
+    }
+
+
+
+}
+
+void printAccountDetails(struct Record r){
+    
+        printf("_____________________\n");
+        printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
+               r.accountNbr,
+               r.deposit.day,
+               r.deposit.month,
+               r.deposit.year,
+               r.country,
+               r.phone,
+               r.amount,
+               r.accountType);
+}
+
+int loadRecords(FILE *file, struct Record *records) {
+    int count = 0;
+    while (fscanf(file,  "%d %d %s %d %d/%d/%d %s %d %lf %s\n",
+                  &records[count].id, &records[count].userId, records[count].name, 
+                  &records[count].accountNbr, &records[count].deposit.month, 
+                  &records[count].deposit.day, &records[count].deposit.year, 
+                  records[count].country, &records[count].phone, 
+                  &records[count].amount, records[count].accountType) != EOF) {
+        count++;
+    }
+    return count;
 }
 
 void transferAccount(struct User u)
@@ -706,7 +798,7 @@ void transferAccount(struct User u)
             // strcpy(u.name,user.name);
             user.id = userId;
             r.id = userId;
-            updateRecord(r,user);
+            updateRecord(r);
             success(u);
         }
 
