@@ -344,7 +344,8 @@ void updateAccount( struct User u)
         updateRecord(r);
         success(u);
     } else {
-        printf("Account ID not found!\n");
+        // printf("\n");
+        stayOrReturn(0,updateAccount,u,"Account ID not found!");
     }
 
 }
@@ -404,15 +405,25 @@ void checkAccounts(struct User u)
     char username[50];
     double interest;
 
+
+
+    // ask for account id
+    printf("\nEnter the account number:");
+    if (scanf("%d", &accountNbr) != 1){
+        // printf("Invalid input!\n");
+
+        // Clear invalid input from the buffer
+        int ch;
+        while ((ch = getchar()) != '\n' && ch != EOF);
+        stayOrReturn(0,checkAccounts,u,"Invalid input!");
+        return;
+    }
+
     FILE *pf = fopen(RECORDS,"r");
     if (pf == NULL) {
         perror("Could not open records file");
         return;
     }
-
-    // ask for account id
-    printf("\nEnter the account number:");
-    scanf("%d", &accountNbr);
     
     system("clear");
     int accountFound = 0;
@@ -428,7 +439,7 @@ void checkAccounts(struct User u)
     fclose(pf);
 
     if (!accountFound) {
-        printf("Account not found.\n");
+        stayOrReturn(0,checkAccounts,u,"Account ID not found!");
         return;
     }
     

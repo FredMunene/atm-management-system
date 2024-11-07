@@ -54,7 +54,6 @@ void mainMenu(struct User u)
         break;
     default:
         printf("Invalid operation!\n");
-        
         break;
     }
 };

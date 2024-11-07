@@ -54,3 +54,4 @@ void deleteRecord();
 void printAccountDetails(struct Record r);
 
 int loadRecords(FILE *file, struct Record *records);
+void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *message);
