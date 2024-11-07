@@ -38,19 +38,19 @@ void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
 
 void stayOrReturn(int notGood, void f(struct User u), struct User u)
 {
-    int option;
+    char option[1];
     if (notGood == 0)
     {
         system("clear");
         printf("\n✖ Record not found!!\n");
     invalid:
         printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
-        scanf("%d", &option);
-        if (option == 0)
+        scanf("%s", option);
+        if (option == "0")
             f(u);
-        else if (option == 1)
+        else if (option == "1")
             mainMenu(u);
-        else if (option == 2)
+        else if (option == "2")
             exit(0);
         else
         {
@@ -61,9 +61,9 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     else
     {
         printf("\nEnter 1 to go to the main menu and 0 to exit:");
-        scanf("%d", &option);
+        scanf("%s", option);
     }
-    if (option == 1)
+    if (option == "1")
     {
         system("clear");
         mainMenu(u);
@@ -432,16 +432,16 @@ void checkAccounts(struct User u)
     }
     
     if (strcmp(r.accountType,"fixed01") == 0 ){
-        interest = r.amount * 0.04 / 12;
-        printf("\nYou will get $%.2lf as interest on day %d of every month\n",interest,r.deposit.day);
+        interest = r.amount * 0.04 ;
+        printf("\nYou will get $%.2lf as interest on day %d/%d/%d\n",interest,r.deposit.month,r.deposit.day,r.deposit.year+1);
     } else if (strcmp(r.accountType,"fixed02") == 0)
     {
-        interest = r.amount * 0.05 / 12;
-        printf("\nYou will get $%.2lf as interest on day %d of every month\n",interest,r.deposit.day);
+        interest = r.amount * 0.05;
+        printf("\nYou will get $%.2lf as interest on day %d/%d/%d\n",interest*2,r.deposit.month,r.deposit.day,r.deposit.year+2);
     } else if (strcmp(r.accountType,"fixed03") == 0)
     {
-        interest = r.amount * 0.08 / 12;
-        printf("\nYou will get $%.2lf as interest on day %d of every month\n",interest,r.deposit.day);
+        interest = r.amount * 0.08;
+        printf("\nYou will get $%.2lf as interest on day %d/%d/%d\n",interest*3,r.deposit.month,r.deposit.day,r.deposit.year+3);
     }else if (strcmp(r.accountType,"savings") == 0)
     {
         interest = r.amount *0.07 / 12;
@@ -467,8 +467,7 @@ void makeTransaction(struct User u)
         perror("Could not open records file");
         return;
     }
-    // obtain account nbr
-    // obtain record 
+
     printf("\nEnter the account number of the customer:");
     scanf("%d",&accNbr);
 
@@ -499,6 +498,7 @@ void makeTransaction(struct User u)
         }
         printf("\nDo you want to:\n\t\t1->Withdraw\n\t\t2->Deposit\nEnter your choice:");
         scanf("%d",&option);
+        while (getchar() != '\n');  // Clear invalid input from buffer
 
         switch (option)
         {
