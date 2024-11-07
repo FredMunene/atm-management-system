@@ -36,21 +36,21 @@ void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
             r.accountType);
 }
 
-void stayOrReturn(int notGood, void f(struct User u), struct User u)
+void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *message)
 {
-    char option[1];
+    int option;
     if (notGood == 0)
     {
         system("clear");
-        printf("\n✖ Record not found!!\n");
+        printf("\n%s\n",message);
     invalid:
         printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
-        scanf("%s", option);
-        if (option == "0")
+        scanf("%d", &option);
+        if (option == 0)
             f(u);
-        else if (option == "1")
+        else if (option == 1)
             mainMenu(u);
-        else if (option == "2")
+        else if (option == 2)
             exit(0);
         else
         {
@@ -61,9 +61,10 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     else
     {
         printf("\nEnter 1 to go to the main menu and 0 to exit:");
-        scanf("%s", option);
+        scanf("%d", &option);
     }
-    if (option == "1")
+
+    if (option == 1)
     {
         system("clear");
         mainMenu(u);
@@ -451,7 +452,7 @@ void checkAccounts(struct User u)
         printf("\nYou will not get interests because the account is of type current\n");
     }
     
-    stayOrReturn(1,checkAccounts,u);
+    stayOrReturn(1,checkAccounts,u,NULL);
 }
 
 void makeTransaction(struct User u)
@@ -492,8 +493,8 @@ void makeTransaction(struct User u)
             strcmp(r.accountType,"fixed02") == 0 || 
             strcmp(r.accountType,"fixed03") == 0 ) 
         {
-            printf("You cannot deposit or withdraw cash in fixed accounts!\n");
-            stayOrReturn(0,makeTransaction,u);
+            // printf("You cannot deposit or withdraw cash in fixed accounts!\n");
+            stayOrReturn(0,makeTransaction,u,"You cannot deposit or withdraw cash in fixed accounts!");
             return;
         }
         printf("\nDo you want to:\n\t\t1->Withdraw\n\t\t2->Deposit\nEnter your choice:");
@@ -507,12 +508,12 @@ void makeTransaction(struct User u)
             printf("Enter the amount:");
             scanf("%lf",&withdrawAmt);
             if (withdrawAmt > r.amount){
-                printf("The amount you chose to withdraw is superior to your available balance!\n");
-                stayOrReturn(0,makeTransaction,u);
+                // printf("The amount you chose to withdraw is superior to your available balance!\n");
+                stayOrReturn(0,makeTransaction,u,"The amount you chose to withdraw is superior to your available balance!");
                 return;
             } else if (withdrawAmt <= 0.0){
-                printf("The amount you chose to withdraw should be greater than $0.0\n");
-                stayOrReturn(0,makeTransaction,u);
+                // printf("The amount you chose to withdraw should be greater than $0.0\n");
+                stayOrReturn(0,makeTransaction,u,"The amount you chose to withdraw should be greater than $0.0");
                 return;
             } else{
                 r.amount = r.amount - withdrawAmt;
@@ -530,9 +531,9 @@ void makeTransaction(struct User u)
             printf("Enter the amount:");
             scanf("%lf",&depositAmt);
             if (depositAmt <= 0.0){
-                printf("The amount you chose to deposit is less than or equal to $0.0");
+                // printf("The amount you chose to deposit is less than or equal to $0.0");
                 // sleep(3);
-                stayOrReturn(0,makeTransaction,u);
+                stayOrReturn(0,makeTransaction,u,"The amount you chose to deposit is less than or equal to $0.0");
                 return;
             }
             r.amount +=depositAmt;
@@ -542,14 +543,15 @@ void makeTransaction(struct User u)
         }
         default:
             printf("Invalid option selected.\n");
-            stayOrReturn(1,makeTransaction,u);
+            stayOrReturn(1,makeTransaction,u,NULL);
             break;
         }
 
     } else{
-        printf("Account not Found");
+        // printf("Account not Found");
         while (getchar() != '\n');  // Clear invalid input from buffer
-        stayOrReturn(0,makeTransaction,u);
+        stayOrReturn(0,makeTransaction,u,"✖ Account not Found");
+        return;
     }
    
 }
@@ -599,11 +601,11 @@ void deleteAccount(struct User u)
 
     deleteRecord(r);
     printf("\n\t\t✔ Account deleted successfully.\n");
-    stayOrReturn(1,deleteAccount,u);
+    stayOrReturn(1,deleteAccount,u,"✔ Account deleted successfully");
 
     } else {
         while (getchar() != '\n');
-        stayOrReturn(0,deleteAccount,u);
+        stayOrReturn(0,deleteAccount,u,"✖ Account not Found");
     }
 }
 
@@ -696,8 +698,8 @@ void transferAccount(struct User u)
         int userId = getUserId(newOwner);
         printf("%d",userId);
         if ( userId == -1){
-            printf("User not Found");
-            stayOrReturn(0,transferAccount,u);
+            // printf("User not Found");
+            stayOrReturn(0,transferAccount,u,"User not Found");
             return;
             
         } else {
@@ -718,8 +720,8 @@ void transferAccount(struct User u)
     } else{
 
         //check user has that account, if not
-        printf("\n\t\t No account found");
-        stayOrReturn(0,transferAccount,u);
+        // printf("\n\t\t No account found");
+        stayOrReturn(0,transferAccount,u,"No account found");
     }
 
 
