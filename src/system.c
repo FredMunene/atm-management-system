@@ -107,6 +107,7 @@ void createNewAcc(struct User u)
     if (!pf)
     {
         printf("Error: Unable to open records file.\n");
+        fclose(pf);
         return;
     }
 
@@ -136,6 +137,12 @@ void createNewAcc(struct User u)
             continue;
         }
 
+        if(!validateDate(r.deposit.month,r.deposit.day)){
+            printf("Invalid date. Please check month and day.\n");
+            while (getchar() != '\n');  // Clear invalid input from buffer
+            continue;
+        }
+
         printf("\nEnter the account number: ");
         if (scanf("%d", &r.accountNbr) != 1)
         {
@@ -143,6 +150,9 @@ void createNewAcc(struct User u)
             while (getchar() != '\n');  // Clear invalid input from buffer
             continue;
         }
+
+
+        
 
         // Check if account already exists for the user
         int accountExists = 0;
@@ -764,4 +774,24 @@ int loadRecords(FILE *file, struct Record *records) {
         count++;
     }
     return count;
+}
+
+int validateDate(int month, int day)
+{
+        if ( month < 1 || month > 12) return 0;
+        int maxDays;
+
+        switch (month)
+        {
+        case 4: case 6: case 11:
+            maxDays = 30;
+            break;
+        case 2:
+            maxDays = 28;
+            break;
+        
+        default:
+            maxDays = 31;
+        }
+        return day >=1 && day <= maxDays;
 }
