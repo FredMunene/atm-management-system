@@ -23,7 +23,8 @@ void mainMenu(struct User u)
     if (isValidInteger(str)){
         option = atoi(str);
     } else {
-        option = 8;
+        while (getchar() != '\n');
+        option = 9;
     }
 
     switch (option)
