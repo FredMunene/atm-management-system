@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 struct Date
 {
@@ -57,3 +58,5 @@ int loadRecords(FILE *file, struct Record *records);
 void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *message);
 
 int validateDate(int month, int day);
+int isValidInteger(const char *input);
+int getValidIntegerInput(const char *prompt);

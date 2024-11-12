@@ -43,6 +43,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *
     {
         system("clear");
         printf("\n%s\n",message);
+        while (getchar() != '\n'); 
     invalid:
         printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
         scanf("%d", &option);
@@ -55,6 +56,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *
         else
         {
             printf("Insert a valid operation!\n");
+            while (getchar() != '\n'); 
             goto invalid;
         }
     }
@@ -143,16 +145,15 @@ void createNewAcc(struct User u)
             continue;
         }
 
-        printf("\nEnter the account number: ");
-        if (scanf("%d", &r.accountNbr) != 1)
-        {
-            printf("Invalid account number. Try again.\n");
-            while (getchar() != '\n');  // Clear invalid input from buffer
-            continue;
-        }
+        // if (scanf("%d", &r.accountNbr) != 1)
+        // {
+        //     printf("Invalid account number. Try again.\n");
+        //     while (getchar() != '\n');  // Clear invalid input from buffer
+        //     continue;
+        // }
 
-
-        
+        while (getchar() != '\n');
+        r.accountNbr = getValidIntegerInput("\nEnter the account number:");
 
         // Check if account already exists for the user
         int accountExists = 0;
@@ -171,20 +172,11 @@ void createNewAcc(struct User u)
         // Gather other details
         printf("\nEnter the country: ");
         scanf("%s", r.country);
-        printf("\nEnter the phone number: ");
-        if (scanf("%d", &r.phone) != 1)
-        {
-            printf("Invalid phone number. Try again.\n");
-            while (getchar() != '\n');  // Clear invalid input from buffer
-            continue;
-        }
-        printf("\nEnter amount to deposit: $");
-        if (scanf("%lf", &r.amount) != 1 || r.amount < 0)
-        {
-            printf("Invalid amount. Try again.\n");
-            while (getchar() != '\n');  // Clear invalid input from buffer
-            continue;
-        }
+        while (getchar() != '\n');
+        r.phone = getValidIntegerInput("\nEnter the phone number:");
+        
+ 
+        r.amount = getValidIntegerInput("\nEnter amount to deposit: $");
 
         printf("\nChoose the type of account:\n\t1 -> savings\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice (1, 2, 3, 4, or 5): ");
         int option;
@@ -356,6 +348,7 @@ void updateAccount( struct User u)
     } else {
         // printf("\n");
         stayOrReturn(0,updateAccount,u,"Account ID not found!");
+        while (getchar() != '\n'); 
     }
 
 }
@@ -794,4 +787,45 @@ int validateDate(int month, int day)
             maxDays = 31;
         }
         return day >=1 && day <= maxDays;
+}
+
+int getValidIntegerInput(const char *prompt){
+    char input[20];
+    int validInput = 0;
+    int number = 0;
+
+    while (!validInput)
+    {
+        printf("%s",prompt);
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input,"\n")] = '\0';
+
+        if(isValidInteger(input)) {
+            validInput = 1;
+            number = atoi(input);
+        } else {
+            printf("Invalid input. Please enter a valid number.\n");
+        }
+
+        
+    }
+    return number;
+}
+
+int isValidInteger(const char *input){
+
+    if (*input == '\0'){
+        return 0;
+    }
+    if (input[0] == '-') {
+        return 0;
+    }
+
+    for (int i = 0; i < strlen(input); i++){
+        if (!isdigit(input[i])){
+            return 0;
+        }
+    }
+
+return 1;
 }
