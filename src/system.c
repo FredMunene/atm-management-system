@@ -96,6 +96,7 @@ invalid:
     }
     else
     {
+        while (getchar() != '\n')       
         printf("Insert a valid operation!\n");
         goto invalid;
     }
@@ -124,7 +125,7 @@ void createNewAcc(struct User u)
         }
         fclose(rf);
     }
-    
+
     int validEntry = 0;
     do
     {
@@ -171,8 +172,7 @@ void createNewAcc(struct User u)
 
         // Gather other details
         printf("\nEnter the country: ");
-        scanf("%s", r.country);
-        while (getchar() != '\n');
+        scanf("%s", r.country);        
         r.phone = getValidIntegerInput("\nEnter the phone number:");
         
  

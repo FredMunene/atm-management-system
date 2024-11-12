@@ -2,7 +2,9 @@
 
 void mainMenu(struct User u)
 {
+    char str[10];
     int option;
+
     system("clear");
     printf("\n\n\t\t======= ATM =======\n\n");
     printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
@@ -14,7 +16,15 @@ void mainMenu(struct User u)
     printf("\n\t\t[6]- Remove existing account\n");
     printf("\n\t\t[7]- Transfer ownership\n");
     printf("\n\t\t[8]- Exit\n");
-    scanf("%d", &option);
+    scanf("%s",str);
+    
+    
+       
+    if (isValidInteger(str)){
+        option = atoi(str);
+    } else {
+        option = 8;
+    }
 
     switch (option)
     {
@@ -61,6 +71,7 @@ void mainMenu(struct User u)
 void initMenu(struct User *u)
 {
     int r = 0;
+    char str[10];
     int option;
     system("clear");
     printf("\n\n\t\t======= ATM =======\n");
@@ -70,7 +81,12 @@ void initMenu(struct User *u)
     printf("\n\t\t[3]- exit\n");
     while (!r)
     {
-        scanf("%d", &option);
+        scanf("%s", str);
+        if (isValidInteger(str)){
+            option = atoi(str);
+        } else {
+            option = 4;
+        }
         switch (option)
         {
         case 1:
