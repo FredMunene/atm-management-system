@@ -182,14 +182,15 @@ void createNewAcc(struct User u)
  
         r.amount = getValidIntegerInput("\nEnter amount to deposit: $");
 
-        printf("\nChoose the type of account:\n\t1 -> savings\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice (1, 2, 3, 4, or 5): ");
+        // printf("\nChoose the type of account:\n\t1 -> savings\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice (1, 2, 3, 4, or 5): ");
         int option;
-        if (scanf("%d", &option) != 1)
-        {
-            printf("Invalid choice. Setting account type as 'savings'.\n");
-            option = 1;
-            while (getchar() != '\n');
-        }
+        option = getValidChoiceInput("\nChoose the type of account:\n\t1 -> savings\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice (1, 2, 3, 4, or 5): ");
+        // if (scanf("%d", &option) != 1)
+        // {
+        //     printf("Invalid choice. Setting account type as 'savings'.\n");
+        //     option = 1;
+        //     while (getchar() != '\n');
+        // }
 
         switch (option)
         {
@@ -198,11 +199,7 @@ void createNewAcc(struct User u)
         case 3: strcpy(r.accountType, "fixed01"); break;
         case 4: strcpy(r.accountType, "fixed02"); break;
         case 5: strcpy(r.accountType, "fixed03"); break;
-        default: 
-            strcpy(r.accountType, "savings");
-            printf("\nAccount type defaulted to Savings.\n");
-            break;
-        }
+        }      
 
         // Set record ID and user ID, then save account
         u.id = getUserId(u);
@@ -811,9 +808,7 @@ int getValidIntegerInput(const char *prompt){
             number = atoi(input);
         } else {
             printf("Invalid input. Please enter a valid number.\n");
-        }
-
-        
+        }  
     }
     return number;
 }
@@ -827,6 +822,9 @@ int isValidInteger(const char *input){
         return 0;
     }
 
+    if (strlen(input) == 1 && input[0] == '0'){
+        return 0;
+    }
     for (int i = 0; i < strlen(input); i++){
         if (!isdigit(input[i])){
             return 0;
@@ -834,4 +832,25 @@ int isValidInteger(const char *input){
     }
 
 return 1;
+}
+
+int getValidChoiceInput(const char *prompt){
+    char input[20];
+    int validInput = 0;
+    int number = 0;
+
+    while (!validInput)
+    {
+        printf("%s",prompt);
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input,"\n")] = '\0';
+
+        if(isValidInteger(input) && *input > 0 && *input <= 5){
+            validInput = 1;
+            number = atoi(input);
+        } else {
+            printf("Invalid input. Please enter a valid number.(1,2,3,4,5)\n");
+        }  
+    }
+    return number;
 }

@@ -57,6 +57,7 @@ void printAccountDetails(struct Record r);
 int loadRecords(FILE *file, struct Record *records);
 void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *message);
 
-int validateDate(int month, int day);
+int validateDate(int month, int day, int year);
 int isValidInteger(const char *input);
 int getValidIntegerInput(const char *prompt);
+int getValidChoiceInput(const char *prompt);
