@@ -9,7 +9,12 @@ void loginMenu(char a[50], char pass[50])
 
     system("clear");
     printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Log In:");
-    scanf("%49s",a); // limit input size
+    scanf("%s",a); // limit input size
+
+    if (strlen(a) >= 50){
+        printf("Username too long! Please try again\n");
+        exit(0);
+    }
 
     // disabling echo
     tcgetattr(fileno(stdin), &oflags);
@@ -23,7 +28,11 @@ void loginMenu(char a[50], char pass[50])
         return exit(1);
     }
     printf("\n\n\n\n\n\t\t\t\tEnter the password to log in:");
-    scanf("%49s", pass);
+    scanf("%s", pass);
+    if (strlen(pass) >= 50){
+        printf("Password too long! Please try again\n");
+        exit(0);
+    }
 
     // restore terminal
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
@@ -66,6 +75,11 @@ void registerMenu( char a[50], char pass[50])
     printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Username:");
     scanf("%s", a);
 
+    if (strlen(a) >= 50){
+        printf("Username too long! Please try again\n");
+        exit(0);
+    }
+
     // disabling echo
     tcgetattr(fileno(stdin), &oflags);
     nflags = oflags;
@@ -80,6 +94,11 @@ void registerMenu( char a[50], char pass[50])
     
     printf("\n\n\n\n\n\t\t\t\tEnter the password to login:");
     scanf("%s", pass);
+
+    if (strlen(pass) >= 50){
+        printf("Password too long! Please try again\n");
+        exit(0);
+    }
 
         // restore terminal
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
