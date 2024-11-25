@@ -143,7 +143,7 @@ void createNewAcc(struct User u)
             continue;
         }
 
-        if(!validateDate(r.deposit.month,r.deposit.day)){
+        if(!validateDate(r.deposit.month,r.deposit.day, r.deposit.year)){
             printf("Invalid date. Please check month and day.\n");
             while (getchar() != '\n');  // Clear invalid input from buffer
             continue;
@@ -775,7 +775,7 @@ int loadRecords(FILE *file, struct Record *records) {
     return count;
 }
 
-int validateDate(int month, int day)
+int validateDate(int month, int day, int year)
 {
         if ( month < 1 || month > 12) return 0;
         int maxDays;
@@ -792,7 +792,7 @@ int validateDate(int month, int day)
         default:
             maxDays = 31;
         }
-        return day >=1 && day <= maxDays;
+        return day >=1 && day <= maxDays && (year >= 1000 && year <= 9999) ;
 }
 
 int getValidIntegerInput(const char *prompt){
