@@ -121,7 +121,10 @@ void createNewAcc(struct User u)
     {
         while (fscanf(rf, "%d %*[^'\n]", &r.id) != EOF)
         {
-            recordId = r.id;
+            if (recordId < r.id){
+                recordId = r.id;
+            }
+        
         }
         fclose(rf);
     }
@@ -172,7 +175,8 @@ void createNewAcc(struct User u)
 
         // Gather other details
         printf("\nEnter the country: ");
-        scanf("%s", r.country);        
+        scanf("%s", r.country);  
+        while (getchar() != '\n');   
         r.phone = getValidIntegerInput("\nEnter the phone number:");
         
  
@@ -394,6 +398,7 @@ void updateRecord(struct Record r) {
 
     for (int i = 0; i < recordCount; i++) {
         struct User user;
+        // records[i].id = i;
         user.id = records[i].userId; // id of user
         strcpy(user.name, records[i].name); // name of user
         saveAccountToFile(file, user, records[i]);
@@ -662,6 +667,7 @@ void deleteRecord(struct Record r) {
 
     for (int i = 0; i < recordCount; i++) {
         struct User u;
+        // records[i].id = i;
         u.id = records[i].userId;
         strcpy(u.name, records[i].name);
         if (i != recordToDelete){
