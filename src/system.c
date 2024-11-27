@@ -42,9 +42,9 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *
     int option;
     if (notGood == 0)
     {
+        while (getchar() != '\n');
         system("clear");
-        printf("\n%s\n",message);
-        while (getchar() != '\n'); 
+        printf("\n%s\n",message);  
     invalid:
         // printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
         option = getValidIntegerInput("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
@@ -84,24 +84,20 @@ void success(struct User u)
 {
     int option;
     printf("\n✔ Success!\n\n");
-// invalid:
     printf("Enter 1 to go to the main menu and 0 to exit!\n");
-    option = getValidChoiceInput(1,2);
+    // option = getValidChoiceInput(0,1);
+    if (scanf("%d",&option) != 1){
+        exit(1);
+    }
     system("clear");
     if (option == 1)
     {
         mainMenu(u);
     }
-    else if (option == 0)
+    else 
     {
         exit(1);
-    }
-    // else
-    // {
-    //     while (getchar() != '\n')       
-    //     printf("Insert a valid operation!\n");
-    //     goto invalid;
-    // }
+    } 
 }
 
 void createNewAcc(struct User u)
@@ -177,7 +173,7 @@ void createNewAcc(struct User u)
         printf("\nEnter amount to deposit: $");
         if(scanf("%lf",&r.amount) != 1) {
              while (getchar() != '\n');
-            stayOrReturn(0,createNewAcc,u,"The amount is too big!");
+            stayOrReturn(0,createNewAcc,u,"Invalid input!");
             return;
         };
         if (r.amount > DBL_MAX){
@@ -482,8 +478,8 @@ void makeTransaction(struct User u)
         return;
     }
 
-    printf("\nEnter the account number of the customer:");
-    scanf("%d",&accNbr);
+    while(getchar() != '\n');
+    accNbr = getValidIntegerInput("\nEnter the account number of the customer:");
 
     while (getAccountFromFile(file,user.name,&r)){
         if (strcmp(u.name,user.name) == 0 && accNbr == r.accountNbr)
@@ -507,7 +503,7 @@ void makeTransaction(struct User u)
         }
         printf("\nDo you want to:\n\t\t1->Withdraw\n\t\t2->Deposit\nEnter your choice:");
         option = getValidChoiceInput(1,2);
-        while (getchar() != '\n');  // Clear invalid input from buffer
+        // while (getchar() != '\n');  // Clear invalid input from buffer
 
         switch (option)
         {
@@ -515,6 +511,7 @@ void makeTransaction(struct User u)
             double withdrawAmt;
             printf("Enter the amount:");
             scanf("%lf",&withdrawAmt);
+            while(getchar() != '\n');
             if (withdrawAmt > r.amount){
                 stayOrReturn(0,makeTransaction,u,"The amount you chose to withdraw is superior to your available balance!");
                 return;
@@ -534,7 +531,7 @@ void makeTransaction(struct User u)
             double depositAmt;
             printf("Enter the amount:");
             if (scanf("%lf",&depositAmt) != 1 ){
-                while (getchar() != '\n');
+                // while (getchar() != '\n');
 
                 stayOrReturn(0, makeTransaction, u, "Invalid input. Please enter a valid amount.");
                 return;
@@ -552,10 +549,6 @@ void makeTransaction(struct User u)
             success(u);
             break;
         }
-        default:
-            printf("Invalid option selected.\n");
-            stayOrReturn(1,makeTransaction,u,NULL);
-            break;
         }
 
     } else{
@@ -605,7 +598,7 @@ void deleteAccount(struct User u)
         stayOrReturn(1,deleteAccount,u,"✔ Account deleted successfully");
 
     } else {
-        while (getchar() != '\n');
+        // while (getchar() != '\n');
         stayOrReturn(0,deleteAccount,u,"✖ Account not Found");
     }
 }
