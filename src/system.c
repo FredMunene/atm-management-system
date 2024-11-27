@@ -46,7 +46,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *
         while (getchar() != '\n'); 
     invalid:
         printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
-        scanf("%d", &option);
+        option = getValidChoiceInput(0,2);
         if (option == 0)
             f(u);
         else if (option == 1)
@@ -63,7 +63,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *
     else
     {
         printf("\nEnter 1 to go to the main menu and 0 to exit:");
-        scanf("%d", &option);
+        option = getValidChoiceInput(0,1);
     }
 
     if (option == 1)
@@ -184,7 +184,7 @@ void createNewAcc(struct User u)
 
         printf("\nChoose the type of account:\n\t1 -> savings\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice (1, 2, 3, 4, or 5): ");
         int option;
-        option = getValidChoiceInput();
+        option = getValidChoiceInput(1,5);
         // if (scanf("%d", &option) != 1)
         // {
         //     printf("Invalid choice. Setting account type as 'savings'.\n");
@@ -834,7 +834,7 @@ int isValidInteger(const char *input){
 return 1;
 }
 
-int getValidChoiceInput(){
+int getValidChoiceInput(int low, int high){
     char input[20];
     int validInput = 0;
     int number = 0;
@@ -850,13 +850,13 @@ int getValidChoiceInput(){
         if(isValidInteger(input)){
             validInput = 1;
             number = atoi(input);
-            if (number >= 1 && number <= 5) {
+            if (number >= low && number <= high) {
                 validInput = 1;
             } else {
-                printf("Invalid input. Please enter a number between 1 and 5.\n");
+                printf("Invalid input. Please enter a number between %d and %d.\n",low,high);
             }
         } else {
-            printf("Invalid input. Please enter a number between 1 and 5.\n");
+            printf("Invalid input. Please enter a number between %d and %d.\n",low,high);
         }  
     }
     return number;
