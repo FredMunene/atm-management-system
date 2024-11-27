@@ -1,4 +1,5 @@
 #include "header.h"
+#include <float.h>
 
 
 const char *RECORDS = "./data/records.txt";
@@ -45,8 +46,8 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *
         printf("\n%s\n",message);
         while (getchar() != '\n'); 
     invalid:
-        printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
-        option = getValidChoiceInput(0,2);
+        // printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
+        option = getValidIntegerInput("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
         if (option == 0)
             f(u);
         else if (option == 1)
@@ -56,25 +57,26 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *
         else
         {
             printf("Insert a valid operation!\n");
-            while (getchar() != '\n'); 
+            // while (getchar() != '\n'); 
             goto invalid;
         }
     }
     else
     {
+        // printf("\nEnter 1 to go to the main menu and 0 to exit:");
+        while (getchar() != '\n'); 
         printf("\nEnter 1 to go to the main menu and 0 to exit:");
         option = getValidChoiceInput(0,1);
-    }
-
-    if (option == 1)
-    {
-        system("clear");
-        mainMenu(u);
-    }
-    else
-    {
-        system("clear");
-        exit(1);
+        if (option == 1)
+        {
+            system("clear");
+            mainMenu(u);
+        }
+        else
+        {
+            system("clear");
+            exit(1);
+        }
     }
 }
 
@@ -82,9 +84,9 @@ void success(struct User u)
 {
     int option;
     printf("\n✔ Success!\n\n");
-invalid:
+// invalid:
     printf("Enter 1 to go to the main menu and 0 to exit!\n");
-    scanf("%d", &option);
+    option = getValidChoiceInput(1,2);
     system("clear");
     if (option == 1)
     {
@@ -94,12 +96,12 @@ invalid:
     {
         exit(1);
     }
-    else
-    {
-        while (getchar() != '\n')       
-        printf("Insert a valid operation!\n");
-        goto invalid;
-    }
+    // else
+    // {
+    //     while (getchar() != '\n')       
+    //     printf("Insert a valid operation!\n");
+    //     goto invalid;
+    // }
 }
 
 void createNewAcc(struct User u)
@@ -139,7 +141,7 @@ void createNewAcc(struct User u)
         if (scanf("%d/%d/%d", &r.deposit.month, &r.deposit.day, &r.deposit.year) != 3)
         {
             printf("Invalid date format. Please enter as mm/dd/yyyy.\n");
-            while (getchar() != '\n');  // Clear invalid input from buffer
+            while (getchar() != '\n'); 
             continue;
         }
 
@@ -148,13 +150,6 @@ void createNewAcc(struct User u)
             while (getchar() != '\n');  // Clear invalid input from buffer
             continue;
         }
-
-        // if (scanf("%d", &r.accountNbr) != 1)
-        // {
-        //     printf("Invalid account number. Try again.\n");
-        //     while (getchar() != '\n');  // Clear invalid input from buffer
-        //     continue;
-        // }
 
         while (getchar() != '\n');
         r.accountNbr = getValidIntegerInput("\nEnter the account number:");
@@ -173,24 +168,30 @@ void createNewAcc(struct User u)
         }
         if (accountExists) continue;
 
-        // Gather other details
         printf("\nEnter the country: ");
         scanf("%s", r.country);  
         while (getchar() != '\n');   
         r.phone = getValidIntegerInput("\nEnter the phone number:");
         
  
-        r.amount = getValidIntegerInput("\nEnter amount to deposit: $");
+        printf("\nEnter amount to deposit: $");
+        if(scanf("%lf",&r.amount) != 1) {
+             while (getchar() != '\n');
+            stayOrReturn(0,createNewAcc,u,"The amount is too big!");
+            return;
+        };
+        if (r.amount > DBL_MAX){
+            stayOrReturn(0,createNewAcc,u,"The amount is too big!");
+            return;
+        } else if (r.amount < 0.0){
+            stayOrReturn(0,makeTransaction,u,"The amount is less than $0.0");
+            return;
+        }
+        while (getchar() != '\n');   
 
         printf("\nChoose the type of account:\n\t1 -> savings\n\t2 -> current\n\t3 -> fixed01(for 1 year)\n\t4 -> fixed02(for 2 years)\n\t5 -> fixed03(for 3 years)\n\n\tEnter your choice (1, 2, 3, 4, or 5): ");
         int option;
         option = getValidChoiceInput(1,5);
-        // if (scanf("%d", &option) != 1)
-        // {
-        //     printf("Invalid choice. Setting account type as 'savings'.\n");
-        //     option = 1;
-        //     while (getchar() != '\n');
-        // }
 
         switch (option)
         {
@@ -248,7 +249,7 @@ int saveUser(int id, char *username, char *password) {
     FILE *file = fopen("data/users.txt", "a");
     if (!file) {
         perror("Could not open users file for writing");
-        return -1;  // Error opening file
+        return -1;  
     }
 
     // Write the new user to the file
@@ -347,7 +348,6 @@ void updateAccount( struct User u)
         updateRecord(r);
         success(u);
     } else {
-        // printf("\n");
         stayOrReturn(0,updateAccount,u,"Account ID not found!");
         while (getchar() != '\n'); 
     }
@@ -395,7 +395,6 @@ void updateRecord(struct Record r) {
 
     for (int i = 0; i < recordCount; i++) {
         struct User user;
-        // records[i].id = i;
         user.id = records[i].userId; // id of user
         strcpy(user.name, records[i].name); // name of user
         saveAccountToFile(file, user, records[i]);
@@ -415,8 +414,6 @@ void checkAccounts(struct User u)
     // ask for account id
     printf("\nEnter the account number:");
     if (scanf("%d", &accountNbr) != 1){
-        // printf("Invalid input!\n");
-
         // Clear invalid input from the buffer
         int ch;
         while ((ch = getchar()) != '\n' && ch != EOF);
@@ -488,8 +485,6 @@ void makeTransaction(struct User u)
     printf("\nEnter the account number of the customer:");
     scanf("%d",&accNbr);
 
-    // check user and account nbr exists
-    // type of transaction
     while (getAccountFromFile(file,user.name,&r)){
         if (strcmp(u.name,user.name) == 0 && accNbr == r.accountNbr)
         {
@@ -501,20 +496,17 @@ void makeTransaction(struct User u)
 
     fclose(file);
 
-    
-
     if (accountFound){
         // check type of account
         if (strcmp(r.accountType,"fixed01") == 0 || 
             strcmp(r.accountType,"fixed02") == 0 || 
             strcmp(r.accountType,"fixed03") == 0 ) 
         {
-            // printf("You cannot deposit or withdraw cash in fixed accounts!\n");
             stayOrReturn(0,makeTransaction,u,"You cannot deposit or withdraw cash in fixed accounts!");
             return;
         }
         printf("\nDo you want to:\n\t\t1->Withdraw\n\t\t2->Deposit\nEnter your choice:");
-        scanf("%d",&option);
+        option = getValidChoiceInput(1,2);
         while (getchar() != '\n');  // Clear invalid input from buffer
 
         switch (option)
@@ -524,16 +516,13 @@ void makeTransaction(struct User u)
             printf("Enter the amount:");
             scanf("%lf",&withdrawAmt);
             if (withdrawAmt > r.amount){
-                // printf("The amount you chose to withdraw is superior to your available balance!\n");
                 stayOrReturn(0,makeTransaction,u,"The amount you chose to withdraw is superior to your available balance!");
                 return;
             } else if (withdrawAmt <= 0.0){
-                // printf("The amount you chose to withdraw should be greater than $0.0\n");
                 stayOrReturn(0,makeTransaction,u,"The amount you chose to withdraw should be greater than $0.0");
                 return;
             } else{
                 r.amount = r.amount - withdrawAmt;
-                // printf("Withdraw Name:%s and Account Nbr:%d",r.name, r.accountNbr);
                 updateRecord(r);
                 printf("%s: Successfully withdrawn $%.2lf. New balance: $%.2lf\n",r.name, withdrawAmt, r.amount);
                 success(u);
@@ -541,15 +530,21 @@ void makeTransaction(struct User u)
             break;
         }
         case 2:{
-            // amount to deposit
             // check for overflow :TODO
             double depositAmt;
             printf("Enter the amount:");
-            scanf("%lf",&depositAmt);
+            if (scanf("%lf",&depositAmt) != 1 ){
+                while (getchar() != '\n');
+
+                stayOrReturn(0, makeTransaction, u, "Invalid input. Please enter a valid amount.");
+                return;
+            };
             if (depositAmt <= 0.0){
-                // printf("The amount you chose to deposit is less than or equal to $0.0");
-                // sleep(3);
-                stayOrReturn(0,makeTransaction,u,"The amount you chose to deposit is less than or equal to $0.0");
+                stayOrReturn(0,makeTransaction,u,"Amount is less than or equal to $0.0.");
+                return;
+            }
+            if (depositAmt > DBL_MAX){
+                stayOrReturn(0, makeTransaction, u, "Amount is too large.");
                 return;
             }
             r.amount +=depositAmt;
@@ -572,12 +567,6 @@ void makeTransaction(struct User u)
    
 }
 
-
-// void displayMessageWithDelay() {
-//     printf("The amount you chose to deposit is less than or equal to $0.0\n");
-//     sleep(3); // Sleep for 3 seconds
-// }
-
 void deleteAccount(struct User u)
 {
 
@@ -593,8 +582,6 @@ void deleteAccount(struct User u)
     printf("\nEnter the account number of the customer:");
     scanf("%d",&accNbr);
 
-    // check user and account nbr exists
-    // type of transaction
     while (getAccountFromFile(file,user.name,&r)){
         if (strcmp(u.name,user.name) == 0 && accNbr == r.accountNbr)
         {
@@ -609,15 +596,13 @@ void deleteAccount(struct User u)
     
 
     if (accountFound){
-        // delete record
-        // print out the details
         system("clear");
         printf("\t\t====== Deleted account for user, %s =====\n\n", u.name);
         printAccountDetails(r);
 
-    deleteRecord(r);
-    printf("\n\t\t✔ Account deleted successfully.\n");
-    stayOrReturn(1,deleteAccount,u,"✔ Account deleted successfully");
+        deleteRecord(r);
+        printf("\n\t\t✔ Account deleted successfully.\n");
+        stayOrReturn(1,deleteAccount,u,"✔ Account deleted successfully");
 
     } else {
         while (getchar() != '\n');
@@ -631,7 +616,6 @@ void deleteRecord(struct Record r) {
     int recordCount = 0;
     int recordToDelete;
 
-    // printf("\n%s:%f",r.name,r.amount);
     if (pf == NULL) {
         perror("Could not open file");
         return;
@@ -664,7 +648,6 @@ void deleteRecord(struct Record r) {
 
     for (int i = 0; i < recordCount; i++) {
         struct User u;
-        // records[i].id = i;
         u.id = records[i].userId;
         strcpy(u.name, records[i].name);
         if (i != recordToDelete){
@@ -715,7 +698,6 @@ void transferAccount(struct User u)
         int userId = getUserId(newOwner);
         printf("%d",userId);
         if ( userId == -1){
-            // printf("User not Found");
             stayOrReturn(0,transferAccount,u,"User not Found");
             return;
             
@@ -735,9 +717,6 @@ void transferAccount(struct User u)
         }
 
     } else{
-
-        //check user has that account, if not
-        // printf("\n\t\t No account found");
         stayOrReturn(0,transferAccount,u,"No account found");
     }
 
@@ -822,9 +801,9 @@ int isValidInteger(const char *input){
         return 0;
     }
 
-    if (strlen(input) == 1 && input[0] == '0'){
-        return 0;
-    }
+    // if (strlen(input) == 1 && input[0] == '0'){
+    //     return 0;
+    // }
     for (int i = 0; i < strlen(input); i++){
         if (!isdigit(input[i])){
             return 0;
