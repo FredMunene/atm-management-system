@@ -60,4 +60,4 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u,const char *
 int validateDate(int month, int day, int year);
 int isValidInteger(const char *input);
 int getValidIntegerInput(const char *prompt);
-int getValidChoiceInput(const char *prompt);
+int getValidChoiceInput();
