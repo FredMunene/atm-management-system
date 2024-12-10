@@ -1,17 +1,18 @@
 # ATM-MANAGEMENT SYSTEM
-
+A simple command-line ATM application implemented in C that allows users to perform various banking operations, including account creation, login, updating account details, and more.
 
 ## Features
-+ Login -- implemented
++ Login 
+    - Using a name and password
 + Register
-    - unique names
-+ Account Creation -- implemented
-+ Check details of existing accounts
+    - Ensures unique usernames
++ Account Creation 
++ Check Details of Existing Accounts
 + Update info of existing accounts
-    - update country or phone number
-+ Remove existing accounts
-+ Check list of owned accounts -- implemented
-+ Make transactions
+    - Allows updating country or phone number
++ Remove Existing Accounts
++ Check List of Owned Accounts -- implemented
++ Make Transactions
 
 ## File System
 ```
@@ -26,16 +27,59 @@
     ├── main.c
     └── system.c
 ```
+## Getting Started
+**Prerequisites:**
+    - GCC (GNU Compiler Collection) installed.
+    - Basic understanding of the command line interface.
 
-## Bonus
-+ Teminal Interface
-+ Trabsfer owner. Check out **pipes and child processes**
+**Installation:**
+1. Clone the repository:
+```
+git clone https://github.com/FredMunene/atm-management-system.git  
+cd atm-management-system 
+```
+2. Compile the project using Makefile:
+```bash
+make  
+```
+3. Run the program:
+```bash
+./atm  
+```
+To re-compile the program after making changes; run
+```bash
+make clean
+```
+
+
+
+
+## Bonus / To be Implemented
++ Terminal Interface
++ Transfer owner. Explore **pipes and child processes**
 + password encryption
-+ Makefile
++ Makefile - Automates compilation
 + SQlite; relational database
 
 
-## Challenges to Solve
-1. the primary key in records.txt
-2. the UserID key in records.txt
-3. Account number should be unique.
+## Contributing
+
+Contributions are welcome! To contribute:
+1. Fork the repository.
+2. Create a new branch:
+```bash
+git checkout -b feature-name  
+```
+3. Commit your changes:
+```bash
+git commit -m "Add your message here"  
+```
+4. Push to the branch:
+```bash
+git push origin feature-name  
+```
+5. Create a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
